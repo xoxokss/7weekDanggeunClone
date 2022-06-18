@@ -1,12 +1,16 @@
 const jwt = require("jsonwebtoken");
-const Cryptr = require("cryptr");
 const user = require("../models/user");
+const Cryptr = require("cryptr");
 const cryptr = new Cryptr("gudetama");
+//const toHashPass = cryptr.encrypt('bacon');
+//const toStingPass = cryptr.decrypt(encryptedString);
+// console.log(encryptedString); // 2a3260f5ac4754b8ee3021ad413ddbc11f04138d01fe0c5889a0dd7b4a97e342a4f43bb43f3c83033626a76f7ace2479705ec7579e4c151f2e2196455be09b29bfc9055f82cdc92a1fe735825af1f75cfb9c94ad765c06a8abe9668fca5c42d45a7ec233f0
+// console.log(decryptedString); // bacon
 
-async function singup(req, res) {
+async function signup(req, res) {
   try {
     const {
-      Password,
+      password,
       passwordcheck,
       phoneNum,
       nickname,
@@ -17,7 +21,7 @@ async function singup(req, res) {
     const existphonNum = await user.findOne().select(phoneNum);
     const existnickname = await user.findOne().select(nickname);
 
-    if (Password !== passwordcheck) {
+    if (password !== passwordcheck) {
       res
         .status(400)
         .send({ errorMessage: "check your passwordcheck is same as password" });
@@ -29,22 +33,22 @@ async function singup(req, res) {
       res.status(400).send({ errorMessage: "try use another nickname" });
     }
 
-    const password = cryptr.encrypt(Password);
+    const heshPassword = cryptr.encrypt(password);
     console.log(password, phoneNum);
     const newUser = await user.create({
-      password,
+      password: heshPassword,
       phoneNum,
       nickname,
       userLocation,
       userImg,
     });
-   
+
     res.status(200).send(
       {
         message:
           "now you can login with your phonenumber and passward! good job",
       }
-      ,newUser
+      /*newUser*/
     );
   } catch (err) {
     res.status(400).send({
@@ -54,23 +58,19 @@ async function singup(req, res) {
 }
 
 async function login(req, res) {
-    const { phoneNum, password } = req.body
+  const { phoneNum, password } = req.body;
 
-    const token = jwt.sign({ userId: user.userId }, "gudetama");
-    res.status(200).send({message:"wellcome"},token)
-
+  const token = jwt.sign({ userId: user.userId }, "gudetama");
+  res.status(200).send({ message: "wellcome" }, token);
 }
 
-
 async function checkMe(req, res) {
- 
-    const { userLocation } = res.locals.user;
-    res.send({
-      userLocation,
-    });
-};
+  const { userLocation } = res.locals.user;
+  res.send({
+    userLocation,
+  });
+}
 
 module.exports.singup = singup;
 module.exports.login = login;
 module.exports.checkMe = checkMe;
-
