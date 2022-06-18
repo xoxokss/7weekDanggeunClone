@@ -59,7 +59,7 @@ async function signup(req, res) {
 
 async function login(req, res) {
   const { phoneNum, password } = req.body;
-  const { nickname: usernick, password: userpass } = await user.findOne({
+  const { nickname: usernick, password: userpass, userId: userId } = await user.findOne({
     phoneNum,
   });
 
@@ -67,26 +67,28 @@ async function login(req, res) {
   console.log(strpass);
   if (!usernick) {
     res.status(400).send({ errorMessage: "회원정보가 없습니다!" });
-  }
+  };
 
   if (password !== strpass) {
     res
       .status(400)
       .send({ errorMessage: "이메일이나 비밀번호가 올바르지 않습니다." });
-  }
+  };
 
-  const token = jwt.sign({ userId: user.userId }, "gudetama");
-
-  res.status(200).send({ message: "wellcome", token });
-}
+  const token = jwt.sign({ userId: userId }, "gudetama");
+ 
+  res.status(200).send({ message: "wellcome", token});
+  
+};
 
 // //사용자 인증
 async function checkMe(req, res) {
-  const { userLocation } = res.locals.user;
-  res.send({
-    userLocation,
-  });
-}
+ 
+    const { userLocation } = res.locals.user;
+    res.send({
+      userLocation,
+    });
+};
 
 module.exports.signup = signup;
 module.exports.login = login;
