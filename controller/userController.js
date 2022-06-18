@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Cryptr = require("cryptr");
-const cryptr = new Cryptr(process.env.HASH);
+const cryptr = new Cryptr("gudetama");
 const Joi = require("joi");
 
 const UserSchema = Joi.object({
