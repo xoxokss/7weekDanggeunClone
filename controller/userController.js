@@ -8,58 +8,51 @@ const cryptr = new Cryptr("gudetama");
 // console.log(decryptedString); // bacon
 
 async function signup(req, res) {
-  try {
-    const {
-      password,
-      passwordcheck,
-      phoneNum,
-      nickname,
-      userLocation,
-      userImg,
-    } = req.body;
+  const { password, passwordcheck, phoneNum, nickname, userLocation, userImg } =
+    req.body;
 
-    const existphonNum = await user.findOne().select(phoneNum);
-    const existnickname = await user.findOne().select(nickname);
+  const existphonNum = await user.findOne(phoneNum);
+  const existnickname = await user.findOne(nickname);
+  console.log(existphonNum, existnickname);
+  if (password !== passwordcheck) {
+    res
+      .status(400)
+      .send({ errorMessage: "check your passwordcheck is same as password" });
 
-    if (password !== passwordcheck) {
-      res
-        .status(400)
-        .send({ errorMessage: "check your passwordcheck is same as password" });
-    }
-    if (existphonNum) {
-      res.status(400).send({ errorMessage: "your phoneNumber is in using" });
-    }
-    if (existnickname) {
-      res.status(400).send({ errorMessage: "try use another nickname" });
-    }
-
-    const heshPassword = cryptr.encrypt(password);
-    console.log(password, phoneNum);
-    const newUser = await user.create({
-      password: heshPassword,
-      phoneNum,
-      nickname: nickname,
-      userLocation,
-      userImg,
-    });
-
-    res.status(200).send(
-      {
-        message:
-          "now you can login with your phonenumber and passward! good job",
-      },
-      newUser
-    );
-  } catch (err) {
-    res.status(400).send({
-      errorMessage: "follow our user form",
-    });
+    return;
   }
+  if (existphonNum) {
+    res.status(400).send({ errorMessage: "your phoneNumber is in using" });
+    return;
+  }
+  if (existnickname) {
+    res.status(400).send({ errorMessage: "try use another nickname" });
+    return;
+  }
+
+  const heshPassword = cryptr.encrypt(password);
+  // console.log(password, phoneNum);
+  const newUser = await user.create({
+    password: heshPassword,
+    phoneNum,
+    nickname: nickname,
+    userLocation,
+    userImg,
+  });
+
+  res.status(200).send({
+    message: "now you can login with your phonenumber and passward! good job",
+    newUser,
+  });
 }
 
 async function login(req, res) {
   const { phoneNum, password } = req.body;
-  const { nickname: usernick, password: userpass, userId: userId } = await user.findOne({
+  const {
+    nickname: usernick,
+    password: userpass,
+    userId: userId,
+  } = await user.findOne({
     phoneNum,
   });
 
@@ -67,28 +60,27 @@ async function login(req, res) {
   console.log(strpass);
   if (!usernick) {
     res.status(400).send({ errorMessage: "회원정보가 없습니다!" });
-  };
+  }
 
   if (password !== strpass) {
     res
       .status(400)
       .send({ errorMessage: "이메일이나 비밀번호가 올바르지 않습니다." });
-  };
+    return;
+  }
 
   const token = jwt.sign({ userId: userId }, "gudetama");
- 
-  res.status(200).send({ message: "wellcome", token});
-  
-};
+
+  res.status(200).send({ message: "wellcome", token });
+}
 
 // //사용자 인증
 async function checkMe(req, res) {
- 
-    const { userLocation } = res.locals.user;
-    res.send({
-      userLocation,
-    });
-};
+  const { userLocation } = res.locals.user;
+  res.send({
+    userLocation,
+  });
+}
 
 module.exports.signup = signup;
 module.exports.login = login;
