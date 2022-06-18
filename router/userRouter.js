@@ -5,7 +5,7 @@ const router = express.Router();
 
 // 회원가입 API.
 router.post("/signup", userController.signup);
-
+// ( /api/user/signup)
 // 로그인 API
 router.post("/login", userController.login);
 
