@@ -71,6 +71,6 @@ async function checkMe(req, res) {
   });
 }
 
-module.exports.singup = singup;
+module.exports.signup = signup;
 module.exports.login = login;
 module.exports.checkMe = checkMe;
