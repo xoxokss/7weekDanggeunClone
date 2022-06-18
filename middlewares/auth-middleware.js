@@ -12,7 +12,7 @@ module.exports = async (req, res, next) => {
   }
   try {
     const { phoneNum } = jwt.verify(tokenValue, process.env.JWT_SECRET);
-    const user = await userDB.findById(phoneNum);
+    const user = await User.findById(phoneNum);
     res.locals.user = user;
     next();
   } catch (error) {

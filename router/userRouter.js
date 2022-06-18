@@ -1,6 +1,7 @@
 const express = require("express");
 const authMiddleware = require("../middlewares/auth-middleware");
 const userController = require("../controller/userController");
+
 const router = express.Router();
 
 // 회원가입 API.
@@ -13,4 +14,5 @@ router.post("/login", userController.login);
 router.get("/me", authMiddleware, userController.checkMe);
 
 //회원탈퇴 미구현
+
 module.exports = router;

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const Cryptr = require("cryptr");
 const user = require("../models/user");
+const Cryptr = require("cryptr");
 const cryptr = new Cryptr("gudetama");
 const Joi = require("joi");
 
