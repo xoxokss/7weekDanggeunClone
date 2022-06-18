@@ -3,7 +3,7 @@ const Cryptr = require("cryptr");
 const user = require("../models/user");
 const cryptr = new Cryptr("gudetama");
 
-async function singup(req, res) {
+async function signup(req, res) {
 
     const { password, passwordcheck, phoneNum, nickname, userLocation, userImg } =
       req.body;
@@ -37,7 +37,7 @@ async function checkMe(req, res) {
     });
 };
 
-module.exports.singup = singup;
+module.exports.signup = signup;
 module.exports.login = login;
 module.exports.checkMe = checkMe;
 

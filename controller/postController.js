@@ -21,7 +21,6 @@ async function allPost(req, res) {
       price: existedPost.price,
       postImg: existedPost.postImg,
       // likeNum,
-      createdAt,
     };
     console.log(posts);
 

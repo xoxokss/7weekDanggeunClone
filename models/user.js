@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 const UserSchema = new mongoose.Schema({
-  phoneNum: Number,
+  phoneNum: String,
   password: String,
   nickname: String,
   userLocation: String,
-  mannerOndo: Number,
+  mannerOndo: String
 });
 //sellList , boughtList
 UserSchema.virtual("userId").get(function() {

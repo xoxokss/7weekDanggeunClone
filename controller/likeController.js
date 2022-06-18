@@ -20,7 +20,6 @@ async function clickbacklike(req, res) {
 module.exports.clicklike = clicklike;
 module.exports.clickbacklike = clickbacklike;
 
-const Like = require("../models/like");
 
 //좋아요 기능
 async function like(req, res) {
