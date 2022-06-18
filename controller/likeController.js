@@ -1,9 +1,10 @@
 const Like = require("../models/like");
 //좋아요 기능
 async function clicklike(req, res) {
+  console.log(d)
 res.status(200);
 }
-//좋아요 취소
+//좋아요 취소 dd
 async function clickbacklike(req, res) {
   const { nickname } = res.locals.user;
   const { postId } = req.params;
