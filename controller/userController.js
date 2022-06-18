@@ -1,21 +1,43 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
 const Cryptr = require("cryptr");
+const user = require("../models/user");
 const cryptr = new Cryptr("gudetama");
-//const toHashPass = cryptr.encrypt('bacon');
-//const toStingPass = cryptr.decrypt(encryptedString);
-//회원가입
-async function signUp(req, res) {
-res.status(200);
-}
-//로그인
+
+async function singup(req, res) {
+
+    const { password, passwordcheck, phoneNum, nickname, userLocation, userImg } =
+      req.body;
+
+    const newUser = await user.create({
+      phoneNum,
+      password,
+      nickname,
+      userLocation,
+      userImg,
+    });
+      
+    res.status(201).send({ message: "now you can login with your phonenumber and passward! good job" }, newUser
+  )
+} 
+
 async function login(req, res) {
-res.status(200);
+    const { phoneNum, password } = req.body
+
+    const token = jwt.sign({ userId: user.userId }, "gudetama");
+    res.status(200).send({message:"wellcome"},token)
+
 }
-// //사용자 인증
+
+
 async function checkMe(req, res) {
-res.status(200);
-}
-module.exports.signUp = signUp;
+ 
+    const { userLocation } = res.locals.user;
+    res.send({
+      userLocation,
+    });
+};
+
+module.exports.singup = singup;
 module.exports.login = login;
 module.exports.checkMe = checkMe;
+
