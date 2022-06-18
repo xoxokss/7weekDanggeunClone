@@ -117,6 +117,6 @@ async function checkMe(req, res) {
   });
 }
 
-module.exports.signUp = signup;
+module.exports.signup = signup;
 module.exports.login = login;
 module.exports.checkMe = checkMe;
