@@ -1,56 +1,82 @@
-const Like = require("../models/like");
+const jwt = require("jsonwebtoken");
+const Cryptr = require("cryptr");
+const user = require("../models/user");
+const cryptr = new Cryptr("gudetama");
 
-async function clicklike(req, res) {
-  res.status(200);
+async function singup(req, res) {
+  try {
+    const {
+      password,
+      passwordcheck,
+      phoneNum,
+      nickname,
+      userLocation,
+      userImg,
+    } = req.body;
+
+    const existphonNum = await user.findOne().select({ phoneNum });
+    const existnickname = await user.findOne().select({ nickname });
+
+    if (password !== passwordcheck) {
+      res
+        .status(400)
+        .send({ errorMessage: "check your passwordcheck is same as password" });
+    } else if (existphonNum) {
+      res.status(400).send({ errorMessage: "your phoneNumber is in using" });
+    } else if (existnickname) {
+      res.status(400).send({ errorMessage: "try use another nickname" });
+    }
+    const hashPassword = cryptr.encrypt(password);
+    const newUser = await user.create({
+      $set: { password: hashPassword },
+      phoneNum,
+      nickname,
+      userLocation,
+      userImg,
+    });
+
+    res.status(200).send(
+      {
+        message:
+          "now you can login with your phonenumber and passward! good job",
+      }
+      /*newUser*/
+    );
+  } catch (err) {
+    res.status(400).send({
+      errorMessage: "follow our user form",
+    });
+  }
 }
 
-async function clickbacklike(req, res) {
-  const { nickname } = res.locals.user;
-  const { postId } = req.params;
-  const findLike = await Like.findByIdAndDelete({ postId, nickname });
-  if (!findLike) {
+async function login(req, res) {
+  const { phoneNum, password } = req.body;
+  const User = await user.findOne({ phoneNum });
+  const nickname = User.nickname;
+  const userpassword = User.password;
+  const strpassword = cryptr.decrypt(userpassword);
+  if (!User) {
+    return res.status(400).send({ errorMessage: "회원정보가 없습니다!" });
+  }
+  const userCompared = await bcrypt.compare(password, strpassword);
+  if (!userCompared) {
     return res
       .status(400)
-      .send({ errorMessage: "err - you didn't clicked like" });
+      .send({ errorMessage: "이메일이나 비밀번호가 올바르지 않습니다." });
   }
-  const likeNum = await Like.findById;
-  
-  res.status(200).json({ likeNum, msg: "좋아요 취소 완료!" });
-}
-module.exports.clicklike = clicklike;
-module.exports.clickbacklike = clickbacklike;
 
-const Like = require("../models/like");
-
-//좋아요 기능
-async function like(req, res) {
-  const { nickname } = res.locals.user;
-  const { postId } = req.param;
-  
-
-  
-  const like = new like({ nickname, postId });
-
- 
-  const { likeNum } = Object.keys(await Like.find(postId, nickname)); //+1
- 
-  console.log(likeNum);
-  res.status(200).send({ likeNum, message: "like Complete" });
+  const token = jwt.sign({ userId: user.userId }, "gudetama");
+  res.status(200).send({ message: "wellcome" }, token);
 }
 
-//좋아요 취소
-async function unlike(req, res) {
-  const { nickname } = res.locals.user;
-  const { postId } = req.params;
-
-  const findLike = await Like.findByIdAndDelete({ postId, nickname });
-
-
-  const { likeNum } = Object.keys(await Like.find(postId, nickname));
-  
-  console.log(likeNum);
-  res.status(200).send({ likeNum, msg: "unlike Complete" });
+// //사용자 인증
+async function checkMe(req, res) {
+  const { userLocation } = res.locals.user;
+  res.send({
+    userLocation,
+  });
 }
 
-module.exports.like = like;
-module.exports.unlike = unlike;
+module.exports.singup = singup;
+module.exports.login = login;
+module.exports.checkMe = checkMe;
