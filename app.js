@@ -34,11 +34,11 @@ app.use(cors(corsOption));
 app.get("/", (req, res) => {
     res.send("Backend Sever")
 });
-app.use("/user", UserRouter);
+app.use("/api/user", UserRouter);
 
-app.use("/post", PostRouter);
+app.use("/api/post", PostRouter);
 
-app.use("/like", likeRouter);
+app.use("/api/like", likeRouter);
 
 app.listen(port, () => {
     console.log(port, "포트로 서버가 켜졌어요~!")

@@ -5,10 +5,9 @@ const UserSchema = new mongoose.Schema({
   nickname: String,
   userLocation: String,
   mannerOndo: Number,
-  userId: String,
 });
 //sellList , boughtList
-UserSchema.virtual("authorId").get(function() {
+UserSchema.virtual("userId").get(function() {
     return this._id.toHexString();
 });
 UserSchema.set("toJSON", { virtuals: true });
