@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const user = require("../models/user");
+const User = require("../models/user");
 const Cryptr = require("cryptr");
 const cryptr = new Cryptr("gudetama");
 const Joi = require("joi");
@@ -117,6 +117,6 @@ async function checkMe(req, res) {
   });
 }
 
-module.exports.signUp = signup;
+module.exports.signup = signup;
 module.exports.login = login;
 module.exports.checkMe = checkMe;
