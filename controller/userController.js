@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const Cryptr = require("cryptr");
+const cryptr = new Cryptr(process.env.HASH);
 const Joi = require("joi");
 
 const UserSchema = Joi.object({
@@ -20,9 +22,6 @@ async function signUp(req, res) {
       phoneNum,
       password,
       passwordCheck,
-      nickname,
-      userLocation,
-      userImg,
     } = await UserSchema.validateAsync(req.body);
     const existUsers = await User.find({ phoneNum });
 
@@ -39,12 +38,14 @@ async function signUp(req, res) {
       });
       return;
     }
+    const hashPassword = cryptr.encrypt(password);
+
     await User.create({
       phoneNum,
-      password,
-      nickname,
-      userLocation,
-      userImg,
+      password : hashPassword,
+      nickname : "닉네임을 변경해주세요.",
+      userLocation : [],
+      userImg : [],
     });
     res.status(201).send({ result: true, message: "회원가입 완료" });
   } 
@@ -60,7 +61,9 @@ async function signUp(req, res) {
 async function login(req, res) {
   try {
     const { phoneNum, password } = req.body;
-    const user = await User.findOne({ phoneNum, password }).exec();
+    const hashPassword = cryptr.encrypt(password);
+
+    const user = await User.findOne({ phoneNum, password:hashPassword }).exec();
 
     if (!user) {
       res.status(401).send({
