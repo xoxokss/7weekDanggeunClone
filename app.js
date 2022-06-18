@@ -1,15 +1,16 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");
+const cors = require("cors"); // cors 패키지 연결
 const UserRouter = require("./router/userRouter");
 const PostRouter = require("./router/postRouter");
 const likeRouter = require("./router/likeRouter");
-const connectDb = require("./database/database"); //몽고디비 스키마 연결
+const connectDB = require("./database/database"); //몽고디비 스키마 연결
 const reqlogMiddleware = require("./middlewares/request-log-middleware");
+require("dotenv").config(); // env 패키지 연결
 
 const port = 8080;
 
-connectDb(); //몽고디비 실행
+connectDB(); //몽고디비 실행
 
 const corsOption = {
     origin: "*",
