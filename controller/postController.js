@@ -45,9 +45,9 @@ async function writePost(req, res) {
     // const { user } = res.locals; // JWT 인증 정보
     const { title, postImg, category, content, price } = req.body;
     await Post.create({
-      //userId,//: user.userId,
-      nickname,//: user.nickname,
-      userLocation,//: user.userLocation,
+      userId: user.userId,
+      nickname: user.nickname,
+      userLocation: user.userLocation,
       title,
       category,
       postImg,
