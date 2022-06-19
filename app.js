@@ -37,11 +37,11 @@ app.get("/api", (req, res) => {
 });
 //app.use("/api", [PostRouter, LikeRouter, UserRouter]);
 //app.use의 사용방법 알아보세용
-app.use("/user", UserRouter);
+app.use("/api/user", UserRouter);
 
-app.use("/post", PostRouter);
+app.use("/api/post", PostRouter);
 
-app.use("/like", LikeRouter);
+app.use("/api/like", LikeRouter);
 
 app.listen(port, () => {
   console.log(port, "포트로 서버가 켜졌어요~!");
