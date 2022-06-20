@@ -15,12 +15,19 @@ async function allPost(req, res) {
 
     let posts = [];
     posts = await Post.find().sort({ createdAt: "asc" }).exec(); //일단 작성시간 순 내림차순
-    console.log(posts); //[]배열 안에 게시글 하나씩[{게시글1},{게시글2},{게시글3}]
-    // const likeNum = await Like.keys({ postId }).length;
-    // const likeNum2 = await Like.find({ postId }).length;
-    //맵 함수로 집어넣어야할듯
+    // console.log(posts); //[]배열 안에 게시글 하나씩[{게시글1},{게시글2},{게시글3}]
 
-    // console.log(likeNum, likeNum2);
+    let allLike = await Like.find().sort({ postId: "asc" }).exec();
+    // like DB 전체 불러오기 : [{좋아요1},{좋아요2}]
+    // console.log(allLike);
+    const postIds = allLike.map((likes) => likes.postId) //postId만 추출
+    console.log(postIds);
+    // const likeNum = await Like.find({postId:{$in:postIds}})
+    // .exec()
+    // .then((list) => list.reduce((prev,a) => ({...prev,a.length})))
+    // console.log(likeNum);
+    const likecnt = await Like.find({postId:postIds}).length
+console.log(likecnt);
     res.send({
       posts: posts.map((a) => ({
         postId: a.postId,
@@ -28,18 +35,13 @@ async function allPost(req, res) {
         price: a.price,
         postImg: a.postImg,
         userLocation: a.userLocation,
-        // likeNum: likeNum,
+        likeNum: likecnt,
         // 시간표기는 프론트와 상의하기
         createdAt:
           a.createdAt.toLocaleDateString("ko-KR") +
           a.createdAt.toLocaleTimeString("ko-KR"),
       })),
     });
-
-    // res.status(200).json({
-    //   userLocation: "성수동2가", //로그인 유저 지역 활성화시 수정하기
-    //   posts,
-    // });
   } catch (err) {
     console.log(err);
     res.status(400).json({ result: false });

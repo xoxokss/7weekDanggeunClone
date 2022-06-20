@@ -11,7 +11,7 @@ require("dotenv").config(); // env 패키지 연결
 const port = 8080;
 
 const corsOption = {
-  origin: ["*"],
+  origin: ["http://localhost:3000",""],
   credentials: true,
 };
 //cors 설정
