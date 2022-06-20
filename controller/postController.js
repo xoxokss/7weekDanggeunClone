@@ -1,41 +1,25 @@
 const Post = require("../models/post");
 const Like = require("../models/like");
 const User = require("../models/user");
+const { valid } = require("joi");
 // 게시글 전체 조회 API
 // 요구사항 : 지역으로 filter, 시간순으로 sort, likeNum
 // 나중에는 지역을 쿼리 값으로 받아 필터링할 수 있을 것 같다.
 // 로그인하지 않은 유저의 userLocation은 어쩌지? if문으로? auth 미들웨어가 가만히 있을까?
 async function allPost(req, res) {
-      // const { user } = res.locals; // 로그인을 해야만 유저의 지역을 활용할 수 있다. 2차스코프
-  try {
-    // const { page } = req.query; //무한스크롤용
-    // const {sort} = req.query; //2차 스코프, 쿼리 값으로 필터링, 정렬
 
-    // const myAroundPost = await Post.find(user.userLocation); //유저 지역 게시글 찾기
-
-    let posts = [];
-    posts = await Post.find().sort({ createdAt: "asc" }).exec(); //일단 작성시간 순 내림차순
-    console.log(posts); //[]배열 안에 게시글 하나씩[{게시글1},{게시글2},{게시글3}]
-    
-    res.send({
-      posts: posts.map((a) => ({
-        postId: a.postId,
-        title: a.title,
-        price: a.price,
-        postImg: a.postImg,
-        userLocation: a.userLocation,
-        likeNum: "0",
-        // 시간표기는 프론트와 상의하기
-        createdAt:
-          a.createdAt.toLocaleDateString("ko-KR") +
-          a.createdAt.toLocaleTimeString("ko-KR"),
-      })),
+    let posts = await Post.find().sort({ createdAt: "asc" }).exec();
+  for (i = 0; i < posts.length; i++) {
+    let post = posts[i]
+    let postId = post.postId
+    let likes = await Like.find({postId: postId });
+    let likeNum = likes.length;
+    const countlike = await Post.findByIdAndUpdate(postId, {
+      $set: { likeNum: likeNum }
     });
-  } catch (err) {
-    console.log(err);
-    res.status(400).json({ result: false });
-  }
-}
+    }
+    res.status(200).send({ posts});
+  } 
 
 // 게시글 작성 API
 // figma에는 지역을 사용자에게 입력받게 되어있는데, 사용자 정보(/user/me)로 갖고가는게 맞지않나?
