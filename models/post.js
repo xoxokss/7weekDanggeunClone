@@ -18,9 +18,9 @@ const PostSchema = new mongoose.Schema(
   }
 );
 
-// PostSchema.virtual('postId').get(function () {
-//   return this._id.toHexString();
-// });
-// PostSchema.set('toJSON', { virtual: true });
+PostSchema.virtual('postId').get(function () {
+  return this._id.toHexString();
+});
+PostSchema.set('toJSON', { virtual: true });
 
 module.exports = mongoose.model('Post', PostSchema);

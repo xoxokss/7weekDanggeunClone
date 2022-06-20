@@ -1,11 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");
+const cors = require("cors"); // cors 패키지 연결
 const UserRouter = require("./router/userRouter");
 const PostRouter = require("./router/postRouter");
 const LikeRouter = require("./router/likeRouter");
 const connectDB = require("./database/database");
 const reqlogMiddleware = require("./middlewares/request-log-middleware");
+require("dotenv").config(); // env 패키지 연결
 
 const port = 8080;
 
@@ -36,11 +37,11 @@ app.get("/api", (req, res) => {
 });
 //app.use("/api", [PostRouter, LikeRouter, UserRouter]);
 //app.use의 사용방법 알아보세용
-app.use("/user", UserRouter);
+app.use("/api/user", UserRouter);
 
-app.use("/post", PostRouter);
+app.use("/api/post", PostRouter);
 
-app.use("/like", LikeRouter);
+app.use("/api/like", LikeRouter);
 
 app.listen(port, () => {
   console.log(port, "포트로 서버가 켜졌어요~!");

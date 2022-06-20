@@ -12,6 +12,7 @@ router.post("/login", userController.login);
 
 // 내 정보 조회 API, 로그인 시 사용
 router.get("/me", authMiddleware, userController.checkMe);
+
 //회원탈퇴 미구현
 
 module.exports = router;
