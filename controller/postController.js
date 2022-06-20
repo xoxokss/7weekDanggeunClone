@@ -6,28 +6,30 @@ const User = require("../models/user");
 // 나중에는 지역을 쿼리 값으로 받아 필터링할 수 있을 것 같다.
 // 로그인하지 않은 유저의 userLocation은 어쩌지? if문으로? auth 미들웨어가 가만히 있을까?
 async function allPost(req, res) {
+      const { user } = res.locals; // 로그인을 해야만 유저의 지역을 활용할 수 있다. 2차스코프
   try {
-    // const { user } = res.locals; // 로그인을 해야만 유저의 지역을 활용할 수 있다. 2차스코프
     // const { page } = req.query; //무한스크롤용
-    // const {sort} = req.query; //2차 스코프, 쿼리로
+    // const {sort} = req.query; //2차 스코프, 쿼리 값으로 필터링, 정렬
 
-    // const existedPost = await Post.find(user.userLocation); //유저 지역 게시글 찾기
+    // const myAroundPost = await Post.find(user.userLocation); //유저 지역 게시글 찾기
 
     let posts = [];
     posts = await Post.find().sort({ createdAt: "asc" }).exec(); //일단 작성시간 순 내림차순
-    // console.log(posts); //[]배열 안에 게시글 하나씩[{게시글1},{게시글2},{게시글3}]
+    console.log(posts); //[]배열 안에 게시글 하나씩[{게시글1},{게시글2},{게시글3}]
 
-    let allLike = await Like.find().sort({ postId: "asc" }).exec();
-    // like DB 전체 불러오기 : [{좋아요1},{좋아요2}]
+    // let allLike = await Like.find()
+    // // like DB 전체 불러오기 : [{좋아요1},{좋아요2}]
     // console.log(allLike);
-    const postIds = allLike.map((likes) => likes.postId) //postId만 추출
+
+    let likecnt = await Like.find({postId}).length 
+    
+    const postIds = posts.map((a) => a.likecnt);
     console.log(postIds);
     // const likeNum = await Like.find({postId:{$in:postIds}})
     // .exec()
     // .then((list) => list.reduce((prev,a) => ({...prev,a.length})))
     // console.log(likeNum);
-    const likecnt = await Like.find({postId:postIds}).length
-console.log(likecnt);
+    
     res.send({
       posts: posts.map((a) => ({
         postId: a.postId,
@@ -35,7 +37,7 @@ console.log(likecnt);
         price: a.price,
         postImg: a.postImg,
         userLocation: a.userLocation,
-        likeNum: likecnt,
+        likeNum: "0",
         // 시간표기는 프론트와 상의하기
         createdAt:
           a.createdAt.toLocaleDateString("ko-KR") +
@@ -52,14 +54,14 @@ console.log(likecnt);
 // figma에는 지역을 사용자에게 입력받게 되어있는데, 사용자 정보(/user/me)로 갖고가는게 맞지않나?
 async function writePost(req, res) {
   const { user } = res.locals; // JWT 인증 정보
-  const { title, postImg, category, userLocation, content, price } = req.body;
+  const { title, postImg, category, content, price } = req.body;
   console.log("작성 콘솔 : ", { user: user.userId });
 
   try {
     await Post.create({
       userId: user.userId,
       nickname: user.nickname,
-      userLocation,
+      userLocation : user.userLocation, //유저 정보 불러와서 지역 작성하기로 고정
       title,
       category,
       postImg,
@@ -137,16 +139,15 @@ async function deletePost(req, res) {
 
 // 게시글 상세 조회 API
 async function getPostDetail(req, res) {
+  const { user } = res.locals;
   const { postId } = req.params;
-  // const { user } = res.locals; // JWT 인증 정보
 
   // const likeNum = Like.keys({ postId }).length; // Like DB안에 해당 postId 데이터베이스 갯수
-  //   const userLike = await Like.findOne({postId: postId, userId:user.userId}).length;
-  // console.log(userLike);
+    const userLike = await Like.find({postId: postId, userId:user.userId}).length;
+  console.log(userLike);
   try {
     const existPost = await Post.findById(postId);
     const postUser = await User.findById(existPost.userId); //게시글 작성자의 유저 정보 불러오기
-    console.log(postUser);
     res.status(200).json({
       detailPost: {
         postId,
