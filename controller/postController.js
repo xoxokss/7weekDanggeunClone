@@ -16,19 +16,6 @@ async function allPost(req, res) {
     let posts = [];
     posts = await Post.find().sort({ createdAt: "asc" }).exec(); //일단 작성시간 순 내림차순
     console.log(posts); //[]배열 안에 게시글 하나씩[{게시글1},{게시글2},{게시글3}]
-
-    // let allLike = await Like.find()
-    // // like DB 전체 불러오기 : [{좋아요1},{좋아요2}]
-    // console.log(allLike);
-
-    let likecnt = await Like.find({postId}).length 
-    
-    const postIds = posts.map((a) => a.likecnt);
-    console.log(postIds);
-    // const likeNum = await Like.find({postId:{$in:postIds}})
-    // .exec()
-    // .then((list) => list.reduce((prev,a) => ({...prev,a.length})))
-    // console.log(likeNum);
     
     res.send({
       posts: posts.map((a) => ({
