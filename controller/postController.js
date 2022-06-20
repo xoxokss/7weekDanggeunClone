@@ -17,7 +17,8 @@ async function allPost(req, res) {
     const countlike = await Post.findByIdAndUpdate(postId, {
       $set: { likeNum: likeNum }
     });
-    }
+  }
+  posts = await Post.find().sort({ createdAt: "asc" }).exec();
     res.status(200).send({ posts});
   } 
 
