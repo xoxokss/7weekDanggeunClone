@@ -7,15 +7,14 @@ const { valid } = require("joi");
 // 나중에는 지역을 쿼리 값으로 받아 필터링할 수 있을 것 같다.
 // 로그인하지 않은 유저의 userLocation은 어쩌지? if문으로? auth 미들웨어가 가만히 있을까?
 async function allPost(req, res) {
-
-    let posts = await Post.find().sort({ createdAt: "asc" }).exec();
+  let posts = await Post.find().sort({ createdAt: "asc" }).exec();
   for (i = 0; i < posts.length; i++) {
-    let post = posts[i]
-    let postId = post.postId
-    let likes = await Like.find({postId: postId });
+    let post = posts[i];
+    let postId = post.postId;
+    let likes = await Like.find({ postId: postId });
     let likeNum = likes.length;
     const countlike = await Post.findByIdAndUpdate(postId, {
-      $set: { likeNum: likeNum }
+      $set: { likeNum: likeNum },
     });
   }
   posts = await Post.find().sort({ createdAt: "asc" }).exec();
@@ -26,14 +25,14 @@ async function allPost(req, res) {
       price: a.price,
       postImg: a.postImg,
       userLocation: a.userLocation,
-      likeNum:a.likeNum,
+      likeNum: a.likeNum,
       // 시간표기는 프론트와 상의하기
       createdAt:
         a.createdAt.toLocaleDateString("ko-KR") +
-        a.createdAt.toLocaleTimeString("ko-KR")
-    }))
+        a.createdAt.toLocaleTimeString("ko-KR"),
+    })),
   });
-  }
+}
 
 // 게시글 작성 API
 // figma에는 지역을 사용자에게 입력받게 되어있는데, 사용자 정보(/user/me)로 갖고가는게 맞지않나?
@@ -46,7 +45,7 @@ async function writePost(req, res) {
     await Post.create({
       userId: user.userId,
       nickname: user.nickname,
-      userLocation : user.userLocation, //유저 정보 불러와서 지역 작성하기로 고정
+      userLocation: user.userLocation, //유저 정보 불러와서 지역 작성하기로 고정
       title,
       category,
       postImg,
@@ -127,12 +126,12 @@ async function getPostDetail(req, res) {
   const { user } = res.locals;
   const { postId } = req.params;
 
-  const likeNum = Like.find({ postId:postId }).length; // Like DB안에 해당 postId 데이터베이스 갯수
+  const likeNum = Like.find({ postId: postId }).length; // Like DB안에 해당 postId 데이터베이스 갯수
 
-  const likes = await Like.find({ nickname:user.nickname });
+  const likes = await Like.find({ postId: postId, nickname: user.nickname });
   const userLike = likes.length;
 
-    // const userLike = await Like.find({nickname : user.nickname}).length;
+  // const userLike = await Like.find({nickname : user.nickname}).length;
   console.log(userLike);
   try {
     const existPost = await Post.findById(postId);
@@ -147,8 +146,8 @@ async function getPostDetail(req, res) {
         userLocation: existPost.userLocation,
         mannerOndo: postUser.mannerOndo,
         price: existPost.price,
-        likeNum : likeNum,
-        userLike : userLike,
+        likeNum: likeNum,
+        userLike: userLike,
       },
     });
   } catch (err) {
