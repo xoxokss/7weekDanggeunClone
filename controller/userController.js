@@ -17,16 +17,20 @@ async function signup(req, res) {
   if (password !== passwordcheck) {
     res
       .status(400)
-      .send({ errorMessage: "check your passwordcheck is same as password" });
+      .send({ result: false,errorMessage: "check your passwordcheck is same as password" });
 
     return;
   }
   if (existphonNum) {
-    res.status(400).send({ errorMessage: "your phoneNumber is in using" });
+    res
+      .status(400)
+      .send({ result: false, errorMessage: "your phoneNumber is in using" });
     return;
   }
   if (existnickname) {
-    res.status(400).send({ errorMessage: "try use another nickname" });
+    res
+      .status(400)
+      .send({ result: false, errorMessage: "try use another nickname" });
     return;
   }
 
@@ -40,10 +44,13 @@ async function signup(req, res) {
     userImg,
   });
 
-  res.status(200).send({
-    message: "now you can login with your phonenumber and passward! good job",
-    newUser,
-  });
+  res
+    .status(200)
+    .send({
+      result: true,
+      message: "now you can login with your phonenumber and passward! good job",
+      newUser,
+    });
 }
 
 async function login(req, res) {
@@ -59,19 +66,24 @@ async function login(req, res) {
   const strpass = cryptr.decrypt(userpass);
   console.log(strpass);
   if (!usernick) {
-    res.status(400).send({ errorMessage: "회원정보가 없습니다!" });
+    res
+      .status(400)
+      .send({ result: false, errorMessage: "회원정보가 없습니다!" });
   }
 
   if (password !== strpass) {
     res
       .status(400)
-      .send({ errorMessage: "이메일이나 비밀번호가 올바르지 않습니다." });
+      .send({
+        result: false,
+        errorMessage: "이메일이나 비밀번호가 올바르지 않습니다.",
+      });
     return;
   }
 
   const token = jwt.sign({ userId: userId }, "gudetama");
 
-  res.status(200).send({ message: "wellcome", token });
+  res.status(200).send({ result: true, message: "wellcome", token });
 }
 
 // //사용자 인증

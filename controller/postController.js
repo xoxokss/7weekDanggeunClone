@@ -20,18 +20,19 @@ async function allPost(req, res) {
   }
   posts = await Post.find().sort({ createdAt: "asc" }).exec();
   res.status(200).send({
+    result: true,
     posts: posts.map((a) => ({
       postId: a.postId,
       title: a.title,
       price: a.price,
       postImg: a.postImg,
       userLocation: a.userLocation,
-      likeNum:a.likeNum,
+      likeNum: a.likeNum,
       // 시간표기는 프론트와 상의하기
       createdAt:
         a.createdAt.toLocaleDateString("ko-KR") +
-        a.createdAt.toLocaleTimeString("ko-KR")
-    }))
+        a.createdAt.toLocaleTimeString("ko-KR"),
+    })),
   });
   }
 
@@ -125,11 +126,7 @@ async function deletePost(req, res) {
 // 게시글 상세 조회 API
 async function getPostDetail(req, res) {
   const { postId } = req.params;
-  // const { user } = res.locals; // JWT 인증 정보
-
-  // const likeNum = Like.keys({ postId }).length; // Like DB안에 해당 postId 데이터베이스 갯수
-  //   const userLike = await Like.findOne({postId: postId, userId:user.userId}).length;
-  // console.log(userLike);
+ 
   try {
     const existPost = await Post.findById(postId);
     const postUser = await User.findById(existPost.userId); //게시글 작성자의 유저 정보 불러오기
@@ -144,8 +141,8 @@ async function getPostDetail(req, res) {
         userLocation: existPost.userLocation,
         mannerOndo: postUser.mannerOndo,
         price: existPost.price,
-        // likeNum,
-        // userLike,
+        likeNum: existPost.likeNum,
+        userLike: islike,
       },
     });
   } catch (err) {
