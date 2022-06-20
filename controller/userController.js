@@ -92,12 +92,6 @@ async function login(req, res) {
 
 // 사용자 인증
 async function checkMe(req, res) {
-<<<<<<< HEAD
-  const { userLocation, userId,nickname,userImg } = res.locals.user;
-  res.send({
-    userLocation , userId, nickname, userImg
- });
-=======
   const { user } = res.locals;
   res.send({
     user: {
@@ -107,7 +101,6 @@ async function checkMe(req, res) {
       userImg: user.userImg,
     },
   });
->>>>>>> 8e88ec9fbd5b2d1819d1545f3fc4786038299005
 }
 // 나의 판매내역 API
 async function mySellList(req, res) {
