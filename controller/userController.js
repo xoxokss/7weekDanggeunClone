@@ -3,10 +3,7 @@ const User = require("../models/user");
 const Post = require("../models/post");
 const Cryptr = require("cryptr");
 const cryptr = new Cryptr("gudetama");
-//const toHashPass = cryptr.encrypt('bacon');
-//const toStingPass = cryptr.decrypt(encryptedString);
-// console.log(encryptedString); // 2a3260f5ac4754b8ee3021ad413ddbc11f04138d01fe0c5889a0dd7b4a97e342a4f43bb43f3c83033626a76f7ace2479705ec7579e4c151f2e2196455be09b29bfc9055f82cdc92a1fe735825af1f75cfb9c94ad765c06a8abe9668fca5c42d45a7ec233f0
-// console.log(decryptedString); // bacon
+const Joi = require("joi");
 
 const UserSchema = Joi.object({
   phoneNum: Joi.string().pattern(new RegExp("^[0-9]{11,11}$")).required(),
@@ -20,8 +17,11 @@ const UserSchema = Joi.object({
 
 // 회원가입 API
 async function signup(req, res) {
-  const { password, passwordcheck, phoneNum, nickname, userLocation, userImg } =
-    req.body;
+  try {
+    const { phoneNum, password, passwordCheck, nickname, userLocation } =
+      await UserSchema.validateAsync(req.body);
+    const existUsers = await User.find({ $or: [{ phoneNum }, { nickname }] });
+    console.log(existUsers);
 
     if (password !== passwordCheck) {
       res.status(400).send({
@@ -55,40 +55,15 @@ async function signup(req, res) {
       message: "요청한 데이터 형식이 올바르지 않습니다.",
     });
   }
-  if (existphonNum) {
-    res.status(400).send({ errorMessage: "your phoneNumber is in using" });
-    return;
-  }
-  if (existnickname) {
-    res.status(400).send({ errorMessage: "try use another nickname" });
-    return;
-  }
-
-  const heshPassword = cryptr.encrypt(password);
-  // console.log(password, phoneNum);
-  const newUser = await user.create({
-    password: heshPassword,
-    phoneNum,
-    nickname: nickname,
-    userLocation,
-    userImg,
-  });
-
-  res.status(200).send({
-    message: "now you can login with your phonenumber and passward! good job",
-    newUser,
-  });
 }
 
+// 로그인 API
 async function login(req, res) {
-  const { phoneNum, password } = req.body;
-  const {
-    nickname: usernick,
-    password: userpass,
-    userId: userId,
-  } = await user.findOne({
-    phoneNum,
-  });
+  try {
+    const { phoneNum, password } = req.body;
+    const { phoneNum: userPhone, password: userPW } = await User.findOne({
+      phoneNum,
+    });
 
     const strpass = cryptr.decrypt(userPW);
     if (!userPhone) {
@@ -113,17 +88,6 @@ async function login(req, res) {
     console.log(err);
     res.status(400).send({ result: false });
   }
-
-  if (password !== strpass) {
-    res
-      .status(400)
-      .send({ errorMessage: "이메일이나 비밀번호가 올바르지 않습니다." });
-    return;
-  }
-
-  const token = jwt.sign({ userId: userId }, "gudetama");
-
-  res.status(200).send({ message: "wellcome", token });
 }
 
 // 사용자 인증
