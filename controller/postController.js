@@ -19,8 +19,21 @@ async function allPost(req, res) {
     });
   }
   posts = await Post.find().sort({ createdAt: "asc" }).exec();
-    res.status(200).send({ posts});
-  } 
+  res.status(200).send({
+    posts: posts.map((a) => ({
+      postId: a.postId,
+      title: a.title,
+      price: a.price,
+      postImg: a.postImg,
+      userLocation: a.userLocation,
+      likeNum:a.likeNum,
+      // 시간표기는 프론트와 상의하기
+      createdAt:
+        a.createdAt.toLocaleDateString("ko-KR") +
+        a.createdAt.toLocaleTimeString("ko-KR")
+    }))
+  });
+  }
 
 // 게시글 작성 API
 // figma에는 지역을 사용자에게 입력받게 되어있는데, 사용자 정보(/user/me)로 갖고가는게 맞지않나?
