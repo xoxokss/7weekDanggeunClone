@@ -114,8 +114,12 @@ async function getPostDetail(req, res) {
   const { user } = res.locals;
   const { postId } = req.params;
 
-  // const likeNum = Like.keys({ postId }).length; // Like DB안에 해당 postId 데이터베이스 갯수
-    const userLike = await Like.find({postId: postId, userId:user.userId}).length;
+  const likeNum = Like.find({ postId:postId }).length; // Like DB안에 해당 postId 데이터베이스 갯수
+
+  const likes = await Like.find({ nickname:user.nickname });
+  const userLike = likes.length;
+
+    // const userLike = await Like.find({nickname : user.nickname}).length;
   console.log(userLike);
   try {
     const existPost = await Post.findById(postId);
@@ -130,8 +134,8 @@ async function getPostDetail(req, res) {
         userLocation: existPost.userLocation,
         mannerOndo: postUser.mannerOndo,
         price: existPost.price,
-        // likeNum,
-        // userLike,
+        likeNum : likeNum,
+        userLike : userLike,
       },
     });
   } catch (err) {
