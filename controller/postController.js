@@ -6,7 +6,7 @@ const User = require("../models/user");
 // 나중에는 지역을 쿼리 값으로 받아 필터링할 수 있을 것 같다.
 // 로그인하지 않은 유저의 userLocation은 어쩌지? if문으로? auth 미들웨어가 가만히 있을까?
 async function allPost(req, res) {
-      const { user } = res.locals; // 로그인을 해야만 유저의 지역을 활용할 수 있다. 2차스코프
+      // const { user } = res.locals; // 로그인을 해야만 유저의 지역을 활용할 수 있다. 2차스코프
   try {
     // const { page } = req.query; //무한스크롤용
     // const {sort} = req.query; //2차 스코프, 쿼리 값으로 필터링, 정렬

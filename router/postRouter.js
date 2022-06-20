@@ -4,7 +4,7 @@ const authMiddleware = require("../middlewares/auth-middleware");
 const router = express.Router();
 
 
-router.get("/", authMiddleware, PostController.allPost); //전체 게시글 조회 라우터
+router.get("/", PostController.allPost); //전체 게시글 조회 라우터
 
 
 router.get("/:postId", authMiddleware, PostController.getPostDetail); // 게시글 상세 조회 라우터
