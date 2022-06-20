@@ -76,10 +76,10 @@ async function login(req, res) {
 
 // //사용자 인증
 async function checkMe(req, res) {
-  const { userLocation } = res.locals.user;
+  const { userLocation, userId,nickname,userImg } = res.locals.user;
   res.send({
-    userLocation,
-  });
+    userLocation , userId, nickname, userImg
+ });
 }
 
 module.exports.signup = signup;
