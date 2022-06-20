@@ -76,7 +76,7 @@ async function writePost(req, res) {
 async function updatePost(req, res) {
   try {
     const { user } = res.locals; // JWT 인증 정보
-    const { postId } = res.params;
+    const { postId } = req.params;
     const { title, postImg, category, content, price } = req.body;
 
     const existedPost = await Post.findById({ _id: postId }); // DB에서 postId가 같은 데이터 찾기
@@ -114,7 +114,7 @@ async function updatePost(req, res) {
 async function deletePost(req, res) {
   try {
     const { user } = res.locals; // JWT 인증 정보
-    const { postId } = res.params;
+    const { postId } = req.params;
 
     const existedPost = await Post.findById({ _id: postId }); // DB에서 postId가 같은 데이터 찾기
     if (user.userId !== existedPost.userId) {
