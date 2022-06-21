@@ -11,7 +11,7 @@ require("dotenv").config(); // env 패키지 연결
 const port = 8080;
 
 const corsOption = {
-  origin: ["http://localhost:8080"],
+  origin: ["http://localhost:3000",""],
   credentials: true,
 };
 //cors 설정
@@ -32,7 +32,7 @@ app.use(reqlogMiddleware);
 app.use(cors(corsOption));
 
 //라우터 등록
-app.get("/api", (req, res) => {
+app.get("/", (req, res) => {
   res.send("Backend Sever");
 });
 //app.use("/api", [PostRouter, LikeRouter, UserRouter]);
