@@ -1,70 +1,37 @@
 const Post = require("../models/post");
 const Like = require("../models/like");
 const User = require("../models/user");
+const { valid } = require("joi");
 // 게시글 전체 조회 API
 // 요구사항 : 지역으로 filter, 시간순으로 sort, likeNum
 // 나중에는 지역을 쿼리 값으로 받아 필터링할 수 있을 것 같다.
 // 로그인하지 않은 유저의 userLocation은 어쩌지? if문으로? auth 미들웨어가 가만히 있을까?
 async function allPost(req, res) {
-  // const { user } = res.locals; // 로그인을 해야만 유저의 지역을 활용할 수 있다. 2차스코프
-  try {
-    // const { page } = req.query; //무한스크롤용
-    // const {sort} = req.query; //2차 스코프, 쿼리 값으로 필터링, 정렬
-
-    // const myAroundPost = await Post.find(user.userLocation); //유저 지역 게시글 찾기
-
-    let posts1 = await Post.find().sort({ createdAt: "asc" }).exec(); //일단 작성시간 순 내림차순 JSON 형식
-
-    const postIds = posts1.map((b) => b.postId);
-    // console.log({ postIds }); //[]배열 안에 게시글 id 하나씩['postId1','postId2','postId3']
-    // console.log(postIds.length); // 개수 8 출력
-
-    let likes = [];
-    let cnt = [];
-    for (i = 0; i < postIds.length; i++) {
-      cnt = await Like.find({ postId: postIds[i] });
-      likes.push({likeNum : cnt.length});
-    }
-    console.log("likes:", likes);
-
-    const posts2 = posts1.map((a) => ({
+  let posts = await Post.find().sort({ createdAt: "asc" }).exec();
+  for (i = 0; i < posts.length; i++) {
+    let post = posts[i];
+    let postId = post.postId;
+    let likes = await Like.find({ postId: postId });
+    let likeNum = likes.length;
+    const countlike = await Post.findByIdAndUpdate(postId, {
+      $set: { likeNum: likeNum },
+    });
+  }
+  posts = await Post.find().sort({ createdAt: "asc" }).exec();
+  res.status(200).send({
+    posts: posts.map((a) => ({
       postId: a.postId,
       title: a.title,
       price: a.price,
       postImg: a.postImg,
       userLocation: a.userLocation,
+      likeNum: a.likeNum,
       // 시간표기는 프론트와 상의하기
       createdAt:
         a.createdAt.toLocaleDateString("ko-KR") +
         a.createdAt.toLocaleTimeString("ko-KR"),
-    }));
-
-    const posts = {postId:posts2.postId,
-      title : posts2.postId}
-    // const posts = Object.assign({}, posts2, likes);
-    console.log("posts:",posts);
-
-    // console.log("두개 출력",likes,posts2)
-    // const posts = posts2.push(likes)
-    res.send({
-      result: true,
-      // posts: posts.map((a) => ({
-      //   postId: a.postId,
-      //   title: a.title,
-      //   price: a.price,
-      //   postImg: a.postImg,
-      //   userLocation: a.userLocation,
-      //   likeNum: a.likeNum,
-      //   // 시간표기는 프론트와 상의하기
-      //   createdAt:
-      //     a.createdAt.toLocaleDateString("ko-KR") +
-      //     a.createdAt.toLocaleTimeString("ko-KR"),
-      // })),
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(400).json({ result: false });
-  }
+    })),
+  });
 }
 
 // 게시글 작성 API
@@ -159,9 +126,12 @@ async function getPostDetail(req, res) {
   const { user } = res.locals;
   const { postId } = req.params;
 
-  // const likeNum = Like.keys({ postId }).length; // Like DB안에 해당 postId 데이터베이스 갯수
-  const userLike = await Like.find({ postId: postId, userId: user.userId })
-    .length;
+  const likeNum = Like.find({ postId: postId }).length; // Like DB안에 해당 postId 데이터베이스 갯수
+
+  const likes = await Like.find({ postId: postId, nickname: user.nickname });
+  const userLike = likes.length;
+
+  // const userLike = await Like.find({nickname : user.nickname}).length;
   console.log(userLike);
   try {
     const existPost = await Post.findById(postId);
@@ -176,8 +146,8 @@ async function getPostDetail(req, res) {
         userLocation: existPost.userLocation,
         mannerOndo: postUser.mannerOndo,
         price: existPost.price,
-        // likeNum,
-        // userLike,
+        likeNum: likeNum,
+        userLike: userLike,
       },
     });
   } catch (err) {

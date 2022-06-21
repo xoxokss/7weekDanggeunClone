@@ -12,6 +12,7 @@ const PostSchema = new mongoose.Schema(
     // createdAt: { type: Date, default: Date.now }, //수동으로 날짜 생성하기, 날짜 UTC+8하는 방법 찾기
     price: String,
     tradeState: String, //(판매중=0, 거래중=1, 거래완료=2)
+    likeNum : Number
   },
   {
     timestamps: true,
