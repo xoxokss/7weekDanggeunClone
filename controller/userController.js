@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Post = require("../models/post");
+const Like = require("../models/like");
 const Cryptr = require("cryptr");
 const cryptr = new Cryptr("gudetama");
 const Joi = require("joi");
@@ -116,17 +117,20 @@ async function mySellList(req, res) {
   }
 }
 
+// 나의 관심목록
 async function myLikeList(req, res) {
   const { user } = res.locals;
   try {
     const like = await Like.find({ userId: user.userId });
-    const likeList = await Post.find({ postId: like.postId }).sort({
-      createdAt: "asc",
-    });
-
+    const likeList = []
+    for (i=0; i<like.length;i++){
+      list = await Post.findById(like[i].postId)
+      likeList.push(list)
+    }
     res.status(200).json({
-      likeList: likeList.map((a) => ({
-        postId: a.postId,
+      likeList: likeList
+      .map((a) => ({
+        postId: a._id,
         title: a.title,
         price: a.price,
         postImg: a.postImg,

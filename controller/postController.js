@@ -4,33 +4,8 @@ const User = require("../models/user");
 
 // 게시글 전체 조회 API
 
-
-// async function allPost(req, res) {
-//   let posts = await Post.find().sort({ createdAt: "asc" }).exec();
-
-//   for (i = 0; i < posts.length; i++) {
-//     let post = posts[i]
-   
-//     let postId = post.postId
-//     let likes = await Like.find({ postId: postId });
-  
-//     let likeNum = 0
-//       likeNum =+ likes.length;
-//     const addlikeNum = Object.assign(post, { likeNum: likeNum });
-//     // posts[i] = post
-//     console.log(post);
-//   }
-//   console.log(posts)
-//     res.status(200)
-//       .send({
-//     result: true,
-//     posts
-//     });
-  
-// } 
-
 async function allPost(req, res) {
-  let posts = await Post.find().sort({ createdAt: "asc" }).exec();
+  posts = await Post.find().sort({ createdAt: "asc" }).exec();
 
   for (i = 0; i < posts.length; i++) {
     let post = posts[i];
@@ -69,7 +44,7 @@ async function writePost(req, res) {
       content,
       price,
       tradeState: "0",
-      likeNum:0
+      likeNum: 0,
     });
     res.status(201).json({ result: true });
   } catch (err) {
@@ -144,13 +119,15 @@ async function deletePost(req, res) {
 async function getPostDetail(req, res) {
   const { user } = res.locals;
   const { postId } = req.params;
+  console.log(postId);
 
-  const likeNum = Like.find({ postId: postId }).length; // Like DB안에 해당 postId 데이터베이스 갯수
+  // 좋아요 수 : Like DB안에 postId가 갖고있는 데이터베이스 개수 세기
+  const likeN = await Like.find({ postId }).exec();
+  const likeNum = likeN.length; //
 
+  // 내가 좋아요 했는지 확인. 좋아요 눌렀으면 1==true|| 안눌렀으면 0==false
   const likes = await Like.find({ postId: postId, userId: user.userId });
   const userLike = likes.length;
-
-  console.log(userLike);
 
   try {
     const existPost = await Post.findById(postId);
@@ -166,10 +143,8 @@ async function getPostDetail(req, res) {
         userLocation: existPost.userLocation,
         mannerOndo: postUser.mannerOndo,
         price: existPost.price,
-
         likeNum: likeNum,
         userLike: userLike,
-
       },
     });
   } catch (err) {
@@ -178,7 +153,7 @@ async function getPostDetail(req, res) {
 }
 
 module.exports.allPost = allPost;
-
+module.exports.allPost2 = allPost2;
 module.exports.writePost = writePost;
 module.exports.getPostDetail = getPostDetail;
 module.exports.updatePost = updatePost;
