@@ -4,29 +4,25 @@ const User = require("../models/user");
 
 // 게시글 전체 조회 API
 
-
 async function allPost(req, res) {
   let posts = await Post.find().sort({ createdAt: "asc" }).exec();
 
   for (i = 0; i < posts.length; i++) {
-    let post = posts[i]
-   
-    let postId = post.postId
-    let likes = await Like.find({ postId: postId });
-  
-    let likeNum = likes.length;
-    const addlikeNum = Object.assign(post, { likeNum: likeNum });
+    let post = posts[i];
 
+    let postId = post.postId;
+    let likes = await Like.find({ postId: postId });
+
+    let likeNum = likes.length;
+    Object.assign(post, { likeNum: likeNum });
+    console.log(post, likeNum);
   }
-  
-    res.status(200)
-      .send({
-        
+
+  res.status(200).send({
     result: true,
-    posts
-    });
-  
-} 
+    post,
+  });
+}
 
 // 게시글 작성 API
 // figma에는 지역을 사용자에게 입력받게 되어있는데, 사용자 정보(/user/me)로 갖고가는게 맞지않나?
@@ -46,7 +42,7 @@ async function writePost(req, res) {
       content,
       price,
       tradeState: "0",
-      likeNum:0
+      likeNum: 0,
     });
     res.status(201).json({ result: true });
   } catch (err) {
@@ -121,13 +117,15 @@ async function deletePost(req, res) {
 async function getPostDetail(req, res) {
   const { user } = res.locals;
   const { postId } = req.params;
+  console.log(postId);
 
-  const likeNum = Like.find({ postId: postId }).length; // Like DB안에 해당 postId 데이터베이스 갯수
+   // 좋아요 수 : Like DB안에 postId가 갖고있는 데이터베이스 개수 세기
+  const likeN = await Like.find({postId}).exec();
+  const likeNum = likeN.length; //
 
+  // 내가 좋아요 했는지 확인. 좋아요 눌렀으면 1==true|| 안눌렀으면 0==false
   const likes = await Like.find({ postId: postId, userId: user.userId });
   const userLike = likes.length;
-
-  console.log(userLike);
 
   try {
     const existPost = await Post.findById(postId);
@@ -143,10 +141,8 @@ async function getPostDetail(req, res) {
         userLocation: existPost.userLocation,
         mannerOndo: postUser.mannerOndo,
         price: existPost.price,
-
         likeNum: likeNum,
         userLike: userLike,
-
       },
     });
   } catch (err) {
