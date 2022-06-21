@@ -5,43 +5,45 @@ const User = require("../models/user");
 // 게시글 전체 조회 API
 
 async function allPost(req, res) {
- 
   let posts = await Post.find().sort({ createdAt: "asc" }).exec();
 
   for (i = 0; i < posts.length; i++) {
-    let post = posts[i]
-   
-    let postId = post.postId
+    let post = posts[i];
+
+    let postId = post.postId;
     let likes = await Like.find({ postId: postId });
-  
+
     let likeNum = likes.length;
     Object.assign(post, { likeNum: likeNum });
-
   }
-  
-    res.status(200)
-      .send({
-        
+
+  res.status(200).send({
     result: true,
-    posts
-    });
-  
-} 
+    posts : posts.map((a)=>({
+      postId:a._id,
+      userLocation:a.userLocation,
+      title: a.title,
+      price : a.price,
+      postImg : a.postImg,
+      likeNum : a.likeNum,
+      createdAt : a.createdAt
+    })),
+  });
+}
 
 // 전체게시글 조회 연습 지우지마세요.
 async function allPost2(req, res) {
   const Posts = await Post.find().sort({ createdAt: "asc" }).exec();
   // console.log(Posts) //  Posts = [{게시글1}, {게시글2}, {게시글3}]
   const postsWithLike = [];
-  let likes = []
+  let likes = [];
   for (i = 0; i < Posts.length; i++) {
-    likes = await Like.find({ postId: Posts[i].postId })
+    likes = await Like.find({ postId: Posts[i].postId });
     postsWithLike.push();
   }
-  console.log(likes)
-  res.status(200).send({ result:"hello"})
-  
-  }
+  console.log(likes);
+  res.status(200).send({ result: "hello" });
+}
 
 // 게시글 작성 API
 // figma에는 지역을 사용자에게 입력받게 되어있는데, 사용자 정보(/user/me)로 갖고가는게 맞지않나?
