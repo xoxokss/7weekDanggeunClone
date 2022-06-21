@@ -83,8 +83,13 @@ async function login(req, res) {
     const token = jwt.sign({ phoneNum: phoneNum }, process.env.JWT_SECRET, {
       expiresIn: "24h",
     });
+
+    // 웰컴 메세지
+    const userNick = await User.findOne({phoneNum:phoneNum})
+    console.log(userNick.nickname+"님이 로그인했습니다.")
+
     //토큰 인증시간을 하루로 제한 ,{expiresIn:'24h'}
-    res.status(200).json({ token, result: true });
+    res.status(200).json({ token, result: true, message : userNick.nickname+"님이 로그인했습니다."});
   } catch (err) {
     console.log(err);
     res.status(400).send({ result: false });
@@ -103,6 +108,7 @@ async function checkMe(req, res) {
     },
   });
 }
+
 // 나의 판매내역 API
 async function mySellList(req, res) {
   const { user } = res.locals;
@@ -110,7 +116,17 @@ async function mySellList(req, res) {
     const sellList = await Post.find({ userId: user.userId }).sort({
       createdAt: "asc",
     });
-    res.status(200).json({ sellList });
+   
+    res.status(200).json({ result:true, 
+      sellList: sellList.map((a) => ({
+      postId: a.postId,
+      title: a.title,
+      price: a.price,
+      postImg: a.postImg,
+      userLocation: a.userLocation,
+      tradeState: a.tradeState,})
+      )
+    })
   } catch (err) {
     console.log(err);
     res.status(400).send({ result: false });
@@ -120,17 +136,24 @@ async function mySellList(req, res) {
 // 나의 관심목록
 async function myLikeList(req, res) {
   const { user } = res.locals;
+
   try {
-    const like = await Like.find({ userId: user.userId });
-    const likeList = []
-    for (i=0; i<like.length;i++){
-      list = await Post.findById(like[i].postId)
-      likeList.push(list)
+    //해당 유저가 누른 좋아요 like DB 전체 찾기
+    const like = await Like.find({ userId: user.userId }).exec();
+    if(!like){
+      res.status
     }
+    const likeList = [];
+    // 반복문으로 좋아요 테이블 하나씩 postId를 찾는다.
+    for (i = 0; i < like.length; i++) {
+      list = await Post.findById(like[i].postId).exec(); 
+      likeList.push(list); //postId에 해당하는 테이블을 하나씩 배열에 넣는다
+    }
+
+    //map함수로 프론트엔드가 원하는 양식으로 response 보내기. postId를 포함해야한다.
     res.status(200).json({
-      likeList: likeList
-      .map((a) => ({
-        postId: a._id,
+      likeList: likeList.map((a) => ({
+        postId: a.postId,
         title: a.title,
         price: a.price,
         postImg: a.postImg,
