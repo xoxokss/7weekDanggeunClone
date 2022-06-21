@@ -116,7 +116,7 @@ async function deletePost(req, res) {
     const { user } = res.locals; // JWT 인증 정보
     const { postId } = req.params;
 
-    const existedPost = await Post.findById({ _id: postId }); // DB에서 postId가 같은 데이터 찾기
+    const existedPost = await Post.findById(postId); // DB에서 postId가 같은 데이터 찾기
     if (user.userId !== existedPost.userId) {
       // 로그인 정보와 게시글 작성자가 같은지 확인
       res.json({
