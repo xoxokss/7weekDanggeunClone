@@ -155,7 +155,7 @@ async function getPostDetail(req, res) {
         mannerOndo: postUser.mannerOndo,
         price: existPost.price,
         likeNum: likeNum,
-        userLike: userLike,
+        userLike: !!userLike,
       },
     });
   } catch (err) {
