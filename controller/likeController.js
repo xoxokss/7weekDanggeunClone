@@ -14,7 +14,7 @@ console.log(user.userId)
   const likes = await Like.find({ postId });
   const likeNum = likes.length;
 
-  res.status(200).send({ likeNum, message: "like Complete" });
+  res.status(200).send({ likeNum, result: true, message: "like Complete" });
 }
 
 //좋아요 취소
@@ -34,7 +34,7 @@ async function unlike(req, res) {
   const likes = await Like.find({ postId });
   const likeNum = likes.length;
 
-  res.status(200).send({ likeNum, msg: "unlike Complete" });
+  res.status(200).send({ likeNum, result: false, msg: "unlike Complete" });
 }
 
 module.exports.onlike = onlike;

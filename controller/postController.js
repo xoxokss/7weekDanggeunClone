@@ -3,43 +3,30 @@ const Like = require("../models/like");
 const User = require("../models/user");
 
 // 게시글 전체 조회 API
-// 요구사항 : 지역으로 filter, 시간순으로 sort, likeNum
-// 나중에는 지역을 쿼리 값으로 받아 필터링할 수 있을 것 같다.
-// 로그인하지 않은 유저의 userLocation은 어쩌지? if문으로? auth 미들웨어가 가만히 있을까?
+
 
 async function allPost(req, res) {
-  posts = await Post.find().sort({ createdAt: "asc" }).exec();
+  let posts = await Post.find().sort({ createdAt: "asc" }).exec();
+
+  for (i = 0; i < posts.length; i++) {
+    let post = posts[i]
+   
+    let postId = post.postId
+    let likes = await Like.find({ postId: postId });
   
-  res.status(200).send({
-    posts: posts.map((a) => ({
-      postId: a.postId,
-      title: a.title,
-      price: a.price,
-      postImg: a.postImg,
-      userLocation: a.userLocation,
-      likeNum: "0",
-      // 시간표기는 프론트와 상의하기
-      createdAt:
-        a.createdAt.toLocaleDateString("ko-KR") +
-        a.createdAt.toLocaleTimeString("ko-KR"),
-    })),
-  });
-}
+    let likeNum = likes.length;
+    const addlikeNum = Object.assign(post, { likeNum: likeNum });
 
-
-async function allPost2(req, res) {
-const Posts = await Post.find().sort({ createdAt: "asc" }).exec();
-// console.log(Posts) //  Posts = [{게시글1}, {게시글2}, {게시글3}]
-const postsWithLike = [];
-let likes = []
-for (i = 0; i < Posts.length; i++) {
-  likes = await Like.find({ postId: Posts[i].postId })
-  postsWithLike.push();
-}
-console.log(likes)
-res.status(200).send({ result:"hello"})
-
-}
+  }
+  
+    res.status(200)
+      .send({
+        
+    result: true,
+    posts
+    });
+  
+} 
 
 // 게시글 작성 API
 // figma에는 지역을 사용자에게 입력받게 되어있는데, 사용자 정보(/user/me)로 갖고가는게 맞지않나?
@@ -59,6 +46,7 @@ async function writePost(req, res) {
       content,
       price,
       tradeState: "0",
+      likeNum:0
     });
     res.status(201).json({ result: true });
   } catch (err) {
@@ -140,6 +128,7 @@ async function getPostDetail(req, res) {
   const userLike = likes.length;
 
   console.log(userLike);
+
   try {
     const existPost = await Post.findById(postId);
     const postUser = await User.findById(existPost.userId); //게시글 작성자의 유저 정보 불러오기
@@ -154,8 +143,10 @@ async function getPostDetail(req, res) {
         userLocation: existPost.userLocation,
         mannerOndo: postUser.mannerOndo,
         price: existPost.price,
+
         likeNum: likeNum,
-        userLike: !!userLike,
+        userLike: userLike,
+
       },
     });
   } catch (err) {
@@ -164,7 +155,7 @@ async function getPostDetail(req, res) {
 }
 
 module.exports.allPost = allPost;
-module.exports.allPost2 = allPost2;
+
 module.exports.writePost = writePost;
 module.exports.getPostDetail = getPostDetail;
 module.exports.updatePost = updatePost;
