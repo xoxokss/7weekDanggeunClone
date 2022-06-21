@@ -13,18 +13,18 @@ async function allPost(req, res) {
     let postId = post.postId;
     let likes = await Like.find({ postId: postId });
 
-    let likeNum = 0
-    likeNum =+likes.length;
+    let likeNum = 0;
+    likeNum = +likes.length;
     Object.assign(post, { likeNum: likeNum });
-    posts[i]=post
-    console.log(posts, likeNum)
+    posts[i] = post;
+    console.log(posts, likeNum);
   }
 
   res.status(200).send({
     result: true,
     posts,
   });
-} 
+}
 
 // 게시글 작성 API
 // figma에는 지역을 사용자에게 입력받게 되어있는데, 사용자 정보(/user/me)로 갖고가는게 맞지않나?
@@ -153,7 +153,6 @@ async function getPostDetail(req, res) {
 }
 
 module.exports.allPost = allPost;
-module.exports.allPost2 = allPost2;
 module.exports.writePost = writePost;
 module.exports.getPostDetail = getPostDetail;
 module.exports.updatePost = updatePost;
