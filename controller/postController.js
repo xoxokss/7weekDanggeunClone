@@ -1,23 +1,15 @@
 const Post = require("../models/post");
 const Like = require("../models/like");
 const User = require("../models/user");
-const { valid } = require("joi");
+
 // 게시글 전체 조회 API
 // 요구사항 : 지역으로 filter, 시간순으로 sort, likeNum
 // 나중에는 지역을 쿼리 값으로 받아 필터링할 수 있을 것 같다.
 // 로그인하지 않은 유저의 userLocation은 어쩌지? if문으로? auth 미들웨어가 가만히 있을까?
+
 async function allPost(req, res) {
-  let posts = await Post.find().sort({ createdAt: "asc" }).exec();
-  for (i = 0; i < posts.length; i++) {
-    let post = posts[i];
-    let postId = post.postId;
-    let likes = await Like.find({ postId: postId });
-    let likeNum = likes.length;
-    const countlike = await Post.findByIdAndUpdate(postId, {
-      $set: { likeNum: likeNum },
-    });
-  }
   posts = await Post.find().sort({ createdAt: "asc" }).exec();
+  
   res.status(200).send({
     posts: posts.map((a) => ({
       postId: a.postId,
@@ -25,13 +17,28 @@ async function allPost(req, res) {
       price: a.price,
       postImg: a.postImg,
       userLocation: a.userLocation,
-      likeNum: a.likeNum,
+      likeNum: "0",
       // 시간표기는 프론트와 상의하기
       createdAt:
         a.createdAt.toLocaleDateString("ko-KR") +
         a.createdAt.toLocaleTimeString("ko-KR"),
     })),
   });
+}
+
+
+async function allPost2(req, res) {
+const Posts = await Post.find().sort({ createdAt: "asc" }).exec();
+// console.log(Posts) //  Posts = [{게시글1}, {게시글2}, {게시글3}]
+const postsWithLike = [];
+let likes = []
+for (i = 0; i < Posts.length; i++) {
+  likes = await Like.find({ postId: Posts[i].postId })
+  postsWithLike.push();
+}
+console.log(likes)
+res.status(200).send({ result:"hello"})
+
 }
 
 // 게시글 작성 API
@@ -112,6 +119,7 @@ async function deletePost(req, res) {
         message: "사용자가 작성한 게시글이 아닙니다.",
       });
     } else {
+      await Like.findByIdAndDelete(postId); //해당 게시물 좋아요 DB 삭제
       await Post.findByIdAndDelete(postId);
       res.status(200).json({ result: true, message: "게시글 삭제 완료" });
     }
@@ -128,10 +136,9 @@ async function getPostDetail(req, res) {
 
   const likeNum = Like.find({ postId: postId }).length; // Like DB안에 해당 postId 데이터베이스 갯수
 
-  const likes = await Like.find({ postId: postId, nickname: user.nickname });
+  const likes = await Like.find({ postId: postId, userId: user.userId });
   const userLike = likes.length;
 
-  // const userLike = await Like.find({nickname : user.nickname}).length;
   console.log(userLike);
   try {
     const existPost = await Post.findById(postId);
@@ -143,11 +150,12 @@ async function getPostDetail(req, res) {
         content: existPost.content,
         postImg: existPost.postImg,
         nickname: existPost.nickname,
+        userImg: postUser.userImg,
         userLocation: existPost.userLocation,
         mannerOndo: postUser.mannerOndo,
         price: existPost.price,
         likeNum: likeNum,
-        userLike: userLike,
+        userLike: !!userLike,
       },
     });
   } catch (err) {
@@ -156,6 +164,7 @@ async function getPostDetail(req, res) {
 }
 
 module.exports.allPost = allPost;
+module.exports.allPost2 = allPost2;
 module.exports.writePost = writePost;
 module.exports.getPostDetail = getPostDetail;
 module.exports.updatePost = updatePost;
