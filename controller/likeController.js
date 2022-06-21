@@ -2,10 +2,10 @@ const Like = require("../models/like");
 
 //좋아요 기능
 async function onlike(req, res) {
-  const { userId } = res.locals.user;
+  const { user } = res.locals;
   const { postId } = req.params;
-
-  const dolike = await Like.create({ userId, postId: postId });
+console.log(user.userId)
+  const dolike = await Like.create({ userId: user.userId, postId: postId });
 
   if (!dolike) {
     res.status(400).send({ errorMessage: "you already clicked once" });
@@ -19,10 +19,13 @@ async function onlike(req, res) {
 
 //좋아요 취소
 async function unlike(req, res) {
-  const { userId } = res.locals.user;
+  const { user } = res.locals;
   const { postId } = req.params;
-  console.log(userId, postId);
-  const delmylike = await Like.findOneAndDelete({ postId, userId });
+  console.log(user.userId, postId);
+  const delmylike = await Like.findOneAndDelete({
+    postId: postId,
+    userId: user.userId,
+  });
 
   if (!delmylike) {
     res.status(400).send({ errorMessage: "you didnt click like" });
