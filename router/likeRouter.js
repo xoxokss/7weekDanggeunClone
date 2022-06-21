@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post("/:postId", authMiddleware, LikeController.onlike);
 
-router.delete("/", LikeController.unlike);
+router.delete("/:postId", authMiddleware, LikeController.unlike);
 
 module.exports = router;
