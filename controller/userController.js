@@ -95,7 +95,7 @@ async function checkMe(req, res) {
   const { user } = res.locals;
   res.send({
     user: {
-      user_id: user.user_id,
+      userId: user.userId,
       nickname: user.nickname,
       userLocation: user.userLocation,
       userImg: user.userImg,
@@ -119,7 +119,7 @@ async function mySellList(req, res) {
 async function myLikeList(req, res) {
   const { user } = res.locals;
   try {
-    const like = await Like.find({ nickname: user.nickname });
+    const like = await Like.find({ userId: user.userId });
     const likeList = await Post.find({ postId: like.postId }).sort({
       createdAt: "asc",
     });
