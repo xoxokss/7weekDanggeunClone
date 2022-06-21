@@ -5,27 +5,50 @@ const User = require("../models/user");
 // 게시글 전체 조회 API
 
 
+// async function allPost(req, res) {
+//   let posts = await Post.find().sort({ createdAt: "asc" }).exec();
+
+//   for (i = 0; i < posts.length; i++) {
+//     let post = posts[i]
+   
+//     let postId = post.postId
+//     let likes = await Like.find({ postId: postId });
+  
+//     let likeNum = 0
+//       likeNum =+ likes.length;
+//     const addlikeNum = Object.assign(post, { likeNum: likeNum });
+//     // posts[i] = post
+//     console.log(post);
+//   }
+//   console.log(posts)
+//     res.status(200)
+//       .send({
+//     result: true,
+//     posts
+//     });
+  
+// } 
+
 async function allPost(req, res) {
   let posts = await Post.find().sort({ createdAt: "asc" }).exec();
 
   for (i = 0; i < posts.length; i++) {
-    let post = posts[i]
-   
-    let postId = post.postId
-    let likes = await Like.find({ postId: postId });
-  
-    let likeNum = likes.length;
-    const addlikeNum = Object.assign(post, { likeNum: likeNum });
+    let post = posts[i];
 
+    let postId = post.postId;
+    let likes = await Like.find({ postId: postId });
+
+    let likeNum = 0
+    likeNum =+likes.length;
+    Object.assign(post, { likeNum: likeNum });
+    posts[i]=post
+    console.log(posts, likeNum)
   }
-  
-    res.status(200)
-      .send({
-        
+
+  res.status(200).send({
     result: true,
-    posts
-    });
-  
+    posts,
+  });
 } 
 
 // 게시글 작성 API
