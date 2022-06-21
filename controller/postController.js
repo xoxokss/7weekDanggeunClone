@@ -5,22 +5,28 @@ const User = require("../models/user");
 // 게시글 전체 조회 API
 
 async function allPost(req, res) {
-  posts = await Post.find().sort({ createdAt: "asc" }).exec();
+ 
+  let posts = await Post.find().sort({ createdAt: "asc" }).exec();
 
-  res.status(200).send({
-    posts: posts.map((a) => ({
-      postId: a.postId,
-      title: a.title,
-      price: a.price,
-      postImg: a.postImg,
-      userLocation: a.userLocation,
-      likeNum: "0",
-      createdAt:
-        a.createdAt.toLocaleDateString("ko-KR") +
-        a.createdAt.toLocaleTimeString("ko-KR"),
-    })),
-  });
-}
+  for (i = 0; i < posts.length; i++) {
+    let post = posts[i]
+   
+    let postId = post.postId
+    let likes = await Like.find({ postId: postId });
+  
+    let likeNum = likes.length;
+    Object.assign(post, { likeNum: likeNum });
+
+  }
+  
+    res.status(200)
+      .send({
+        
+    result: true,
+    posts
+    });
+  
+} 
 
 // 전체게시글 조회 연습 지우지마세요.
 async function allPost2(req, res) {
