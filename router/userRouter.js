@@ -16,6 +16,9 @@ router.get("/me", authMiddleware, userController.checkMe);
 // 나의 판매내역
 router.get("/sellList", authMiddleware, userController.mySellList);
 
+// 나의 관심목록
+router.get("/likeList", authMiddleware, userController.myLikeList);
+
 // 프로필 수정
 router.put("/edit", authMiddleware, userController.userEdit);
 

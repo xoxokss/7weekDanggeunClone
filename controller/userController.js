@@ -116,6 +116,30 @@ async function mySellList(req, res) {
   }
 }
 
+async function myLikeList(req, res) {
+  const { user } = res.locals;
+  try {
+    const like = await Like.find({ nickname: user.nickname });
+    const likeList = await Post.find({ postId: like.postId }).sort({
+      createdAt: "asc",
+    });
+
+    res.status(200).json({
+      likeList: likeList.map((a) => ({
+        postId: a.postId,
+        title: a.title,
+        price: a.price,
+        postImg: a.postImg,
+        userLocation: a.userLocation,
+        tradeState: a.tradeState,
+      })),
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).send({ result: false });
+  }
+}
+
 // 프로필 수정
 async function userEdit(req, res) {
   const { user } = res.locals;
@@ -143,4 +167,5 @@ module.exports.signup = signup;
 module.exports.login = login;
 module.exports.checkMe = checkMe;
 module.exports.mySellList = mySellList;
+module.exports.myLikeList = myLikeList;
 module.exports.userEdit = userEdit;
