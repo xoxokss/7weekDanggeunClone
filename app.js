@@ -76,7 +76,7 @@ const corsOption = {
     "*",
   ],
   methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
-  credentials: true,
+  // credentials: true,
 };
 //cors 설정
 
