@@ -178,7 +178,7 @@ async function updatatradeState(req, res) {
   const { postId } = req.params;
   try {
     await Post.findByIdAndUpdate(
-      { postId: postId }, //해당 postId 찾아서 내용 수정
+      { _id: postId }, //해당 postId 찾아서 내용 수정
       {
         $set: { tradeState: tradeState },
       }
