@@ -15,7 +15,7 @@ const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http, {
   cors: {
-    origin: "*",
+    origin: "http://spartastatic.s3-website.ap-northeast-2.amazonaws.com",
     methods: ["GET", "POST"]
   }
 });
