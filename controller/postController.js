@@ -23,6 +23,7 @@ async function allPost(req, res) {
       postId: a._id,
       userLocation: a.userLocation,
       title: a.title,
+      tradeState: a.tradeState,
       price: a.price,
       postImg: a.postImg,
       likeNum: a.likeNum,
