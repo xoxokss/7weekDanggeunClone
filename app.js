@@ -67,7 +67,7 @@ const corsOption = {
   origin: [
     "http://localhost:3000",
     "http://spartastatic.s3-website.ap-northeast-2.amazonaws.com",
-    "http://localhost:4000",
+    "http://localhost:8080",
   ],
   credentials: true,
 };
