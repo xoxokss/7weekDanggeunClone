@@ -7,7 +7,7 @@ const router = express.Router();
 router.get("/", PostController.allPost); //전체 게시글 조회 라우터
 
 
-router.patch("/:postId", PostController.updatatradeState); // 거래 상태 토글 라우터
+router.patch("/tradeState/:postId", PostController.updatatradeState); // 거래 상태 토글 라우터
 
 
 router.get("/:postId", authMiddleware, PostController.getPostDetail); // 게시글 상세 조회 라우터
