@@ -44,8 +44,13 @@ io.on("connection", (socket) => {
 
   // 이벤트 - 채팅 메세지 - 기본
   socket.on("chatting", (data) => {
-    const { nickname, msg, userImg} = data;
-    io.emit("chatting", {nickname, msg, userImg, time : moment(new Date()).format("h:ss A")}); // 메시지 송신
+    const { nickname, msg, userImg } = data;
+    io.emit("chatting", {
+      nickname,
+      msg,
+      userImg,
+      time: moment(new Date()).format("h:ss A"),
+    }); // 메시지 송신
   });
 
   /*
@@ -68,7 +73,9 @@ const corsOption = {
     "http://localhost:3000",
     "http://spartastatic.s3-website.ap-northeast-2.amazonaws.com",
     "http://localhost:8080",
+    "*",
   ],
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
   credentials: true,
 };
 //cors 설정
