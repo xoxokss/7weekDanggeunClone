@@ -45,7 +45,7 @@ async function signup(req, res) {
       password: hashPassword,
       nickname,
       userLocation,
-      userImg: "",
+      userImg: "https://3dyoon.imweb.me/common/img/default_profile.png",
       mannerOndo: "36.5",
     });
     res.status(201).send({ result: true, message: "회원가입 완료" });
