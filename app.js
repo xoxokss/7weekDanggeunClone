@@ -11,7 +11,7 @@ require("dotenv").config(); // env 패키지 연결
 const port = 8080;
 
 const corsOption = {
-  origin: ["http://localhost:3000",""],
+  origin: ["http://localhost:3000","http://spartastatic.s3-website.ap-northeast-2.amazonaws.com","http://localhost:4000"],
   credentials: true,
 };
 //cors 설정

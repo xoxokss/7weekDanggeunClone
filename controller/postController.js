@@ -5,7 +5,7 @@ const User = require("../models/user");
 // 게시글 전체 조회 API
 
 async function allPost(req, res) {
-  posts = await Post.find().sort({ createdAt: "asc" }).exec();
+  let posts = await Post.find().sort({ createdAt: "asc" }).exec();
 
   for (i = 0; i < posts.length; i++) {
     let post = posts[i];
@@ -13,17 +13,36 @@ async function allPost(req, res) {
     let postId = post.postId;
     let likes = await Like.find({ postId: postId });
 
-    let likeNum = 0;
-    likeNum = +likes.length;
+    let likeNum = likes.length;
     Object.assign(post, { likeNum: likeNum });
-    posts[i] = post;
-    console.log(posts, likeNum);
   }
 
   res.status(200).send({
     result: true,
-    posts,
+    posts: posts.map((a) => ({
+      postId: a._id,
+      userLocation: a.userLocation,
+      title: a.title,
+      price: a.price,
+      postImg: a.postImg,
+      likeNum: a.likeNum,
+      createdAt: a.createdAt,
+    })),
   });
+}
+
+// 전체게시글 조회 연습 지우지마세요.
+async function allPost2(req, res) {
+  const Posts = await Post.find().sort({ createdAt: "asc" }).exec();
+  // console.log(Posts) //  Posts = [{게시글1}, {게시글2}, {게시글3}]
+  const postsWithLike = [];
+  let likes = [];
+  for (i = 0; i < Posts.length; i++) {
+    likes = await Like.find({ postId: Posts[i].postId });
+    postsWithLike.push();
+  }
+  console.log(likes);
+  res.status(200).send({ result: "hello" });
 }
 
 // 게시글 작성 API
@@ -97,7 +116,7 @@ async function deletePost(req, res) {
     const { user } = res.locals; // JWT 인증 정보
     const { postId } = req.params;
 
-    const existedPost = await Post.findById({ _id: postId }); // DB에서 postId가 같은 데이터 찾기
+    const existedPost = await Post.findById(postId); // DB에서 postId가 같은 데이터 찾기
     if (user.userId !== existedPost.userId) {
       // 로그인 정보와 게시글 작성자가 같은지 확인
       res.json({
@@ -139,12 +158,13 @@ async function getPostDetail(req, res) {
         content: existPost.content,
         postImg: existPost.postImg,
         nickname: existPost.nickname,
+        category: existPost.category,
         userImg: postUser.userImg,
         userLocation: existPost.userLocation,
         mannerOndo: postUser.mannerOndo,
         price: existPost.price,
         likeNum: likeNum,
-        userLike: userLike,
+        userLike: !!userLike,
       },
     });
   } catch (err) {
@@ -152,7 +172,30 @@ async function getPostDetail(req, res) {
   }
 }
 
+// 거래 상태 토글 API (판매중 : 0 / 예약중 : 1 / 거래완료 : 2)
+async function updatatradeState(req, res) {
+  const { tradeState } = req.body;
+  const { postId } = req.params;
+  try {
+    await Post.findByIdAndUpdate(
+      { _id: postId }, //해당 postId 찾아서 내용 수정
+      {
+        $set: { tradeState: tradeState },
+      }
+    );
+
+    res.status(200).json({ result: true, message: "Updated trade state" });
+  } catch (err) {
+    res.status(400).json({
+      err,
+      result: false,
+      errorMessage: "coudn't upload trade state",
+    });
+  }
+}
+
 module.exports.allPost = allPost;
+module.exports.updatatradeState = updatatradeState;
 module.exports.writePost = writePost;
 module.exports.getPostDetail = getPostDetail;
 module.exports.updatePost = updatePost;
