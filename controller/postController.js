@@ -19,14 +19,14 @@ async function allPost(req, res) {
 
   res.status(200).send({
     result: true,
-    posts : posts.map((a)=>({
-      postId:a._id,
-      userLocation:a.userLocation,
+    posts: posts.map((a) => ({
+      postId: a._id,
+      userLocation: a.userLocation,
       title: a.title,
-      price : a.price,
-      postImg : a.postImg,
-      likeNum : a.likeNum,
-      createdAt : a.createdAt
+      price: a.price,
+      postImg: a.postImg,
+      likeNum: a.likeNum,
+      createdAt: a.createdAt,
     })),
   });
 }
@@ -158,6 +158,7 @@ async function getPostDetail(req, res) {
         content: existPost.content,
         postImg: existPost.postImg,
         nickname: existPost.nickname,
+        category: existPost.category,
         userImg: postUser.userImg,
         userLocation: existPost.userLocation,
         mannerOndo: postUser.mannerOndo,
