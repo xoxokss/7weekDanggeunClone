@@ -140,10 +140,8 @@ async function myLikeList(req, res) {
   try {
     //해당 유저가 누른 좋아요 like DB 전체 찾기
     const like = await Like.find({ userId: user.userId }).exec();
-    if(!like){
-      res.status
-    }
     const likeList = [];
+    
     // 반복문으로 좋아요 테이블 하나씩 postId를 찾는다.
     for (i = 0; i < like.length; i++) {
       list = await Post.findById(like[i].postId).exec(); 
