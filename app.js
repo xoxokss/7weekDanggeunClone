@@ -13,7 +13,12 @@ const app = express();
 
 //express socket.io 통합 서버 연결 (8080번)
 const http = require("http").createServer(app);
-const io = require("socket.io")(http);
+const io = require("socket.io")(http, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
 /*
 // socket.io 별도 서버 연결 (4000번)
@@ -72,11 +77,9 @@ const corsOption = {
   origin: [
     "http://localhost:3000",
     "http://spartastatic.s3-website.ap-northeast-2.amazonaws.com",
-    "http://localhost:8080",
-    "*",
+    "http://localhost:8080"
   ],
-  methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
-  // credentials: true,
+  credentials: true,
 };
 //cors 설정
 
