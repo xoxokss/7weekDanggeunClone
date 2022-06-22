@@ -1,48 +1,37 @@
 const Post = require("../models/post");
 const Like = require("../models/like");
 const User = require("../models/user");
+const { findByIdAndUpdate } = require("../models/post");
 
 // 게시글 전체 조회 API
 
 async function allPost(req, res) {
   let posts = await Post.find().sort({ createdAt: "asc" }).exec();
+  try {
+    for (i = 0; i < posts.length; i++) {
+      let post = posts[i];
 
-  for (i = 0; i < posts.length; i++) {
-    let post = posts[i];
+      let postId = post.postId;
+      console.log(postId);
+      let likes = await Like.find({ PostId: postId });
+      console.log(likes);
+      let likeNum = 0;
+      likeNum = +likes.length;
+      Object.assign(post, { likeNum: likeNum, postsId: postId });
 
-    let postId = post.postId;
-    let likes = await Like.find({ postId: postId });
+      console.log(post, likeNum, postId);
+    }
 
-    let likeNum = likes.length;
-    Object.assign(post, { likeNum: likeNum });
+    res.status(200).send({
+      result: true,
+      posts,
+    });
+  } catch (err) {
+    console.log(err);
+    res
+      .status(400)
+      .json({ result: false, errorMessage: "게시글 열람을 할 수 없습니다." });
   }
-
-  res.status(200).send({
-    result: true,
-    posts: posts.map((a) => ({
-      postId: a._id,
-      userLocation: a.userLocation,
-      title: a.title,
-      price: a.price,
-      postImg: a.postImg,
-      likeNum: a.likeNum,
-      createdAt: a.createdAt,
-    })),
-  });
-}
-
-// 전체게시글 조회 연습 지우지마세요.
-async function allPost2(req, res) {
-  const Posts = await Post.find().sort({ createdAt: "asc" }).exec();
-  // console.log(Posts) //  Posts = [{게시글1}, {게시글2}, {게시글3}]
-  const postsWithLike = [];
-  let likes = [];
-  for (i = 0; i < Posts.length; i++) {
-    likes = await Like.find({ postId: Posts[i].postId });
-    postsWithLike.push();
-  }
-  console.log(likes);
-  res.status(200).send({ result: "hello" });
 }
 
 // 게시글 작성 API
@@ -68,7 +57,9 @@ async function writePost(req, res) {
     res.status(201).json({ result: true });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ result: false });
+    res
+      .status(400)
+      .json({ result: false, errorMessage: "게시글 작성을 할 수 없습니다." });
   }
 }
 
@@ -106,7 +97,9 @@ async function updatePost(req, res) {
     }
   } catch (err) {
     console.log(err);
-    res.status(400).json({ result: false });
+    res
+      .status(400)
+      .json({ result: false, errorMessage: "게시글 수정을 할 수 없습니다." });
   }
 }
 
@@ -116,7 +109,7 @@ async function deletePost(req, res) {
     const { user } = res.locals; // JWT 인증 정보
     const { postId } = req.params;
 
-    const existedPost = await Post.findById(postId); // DB에서 postId가 같은 데이터 찾기
+    const existedPost = await Post.findById({ _id: postId }); // DB에서 postId가 같은 데이터 찾기
     if (user.userId !== existedPost.userId) {
       // 로그인 정보와 게시글 작성자가 같은지 확인
       res.json({
@@ -130,7 +123,9 @@ async function deletePost(req, res) {
     }
   } catch (err) {
     console.log(err);
-    res.status(400).json({ result: false });
+    res
+      .status(400)
+      .json({ result: false, errorMessage: "게시물 삭제를 할 수 없습니다." });
   }
 }
 
@@ -138,15 +133,13 @@ async function deletePost(req, res) {
 async function getPostDetail(req, res) {
   const { user } = res.locals;
   const { postId } = req.params;
-  console.log(postId);
 
-  // 좋아요 수 : Like DB안에 postId가 갖고있는 데이터베이스 개수 세기
-  const likeN = await Like.find({ postId }).exec();
-  const likeNum = likeN.length; //
+  const likeNum = Like.find({ postId: postId }).length; // Like DB안에 해당 postId 데이터베이스 갯수
 
-  // 내가 좋아요 했는지 확인. 좋아요 눌렀으면 1==true|| 안눌렀으면 0==false
   const likes = await Like.find({ postId: postId, userId: user.userId });
   const userLike = likes.length;
+
+  console.log(userLike);
 
   try {
     const existPost = await Post.findById(postId);
@@ -158,23 +151,49 @@ async function getPostDetail(req, res) {
         content: existPost.content,
         postImg: existPost.postImg,
         nickname: existPost.nickname,
-        category: existPost.category,
         userImg: postUser.userImg,
         userLocation: existPost.userLocation,
         mannerOndo: postUser.mannerOndo,
         price: existPost.price,
+        category: existPost.category,
         likeNum: likeNum,
-        userLike: !!userLike,
+        userLike: userLike,
       },
     });
   } catch (err) {
-    res.status(400).json({ err, result: false });
+    res
+      .status(400)
+      .json({
+        err,
+        result: false,
+        errorMessage: "상세페이지를 확인할 수 없습니다",
+      });
   }
 }
+async function updatatradeState(req, res) {
+  const { category } = req.body;
+  const { postId } = req.params;
+  try {
+    const postUser = await Post.findByIdAndUpdate(
+      { postId: postId }, //해당 postId 찾아서 내용 수정
+      {
+        $set: { category: category },
+      }
+    );
 
+    res.status(200).json({ result: true, message: "upload tradestate" });
+  } catch (err) {
+    res.status(400).json({
+      err,
+      result: false,
+      errorMessage: "coudn't upload tradestate",
+    });
+  }
+}
 module.exports.allPost = allPost;
-module.exports.allPost2 = allPost2;
+
 module.exports.writePost = writePost;
 module.exports.getPostDetail = getPostDetail;
 module.exports.updatePost = updatePost;
 module.exports.deletePost = deletePost;
+module.exports.updatatradeState = updatatradeState;
