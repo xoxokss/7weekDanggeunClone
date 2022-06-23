@@ -20,12 +20,8 @@ moment.tz.setDefault("Asia/Seoul");
 const http = require("http").createServer(app);
 const io = require("socket.io")(http, {
   cors: {
-    origin: [
-      "http://localhost:3000",
-      "http://spartastatic.s3-website.ap-northeast-2.amazonaws.com",
-      "http://localhost:8080",
-    ],
-    methods: ["GET", "POST"]
+    origin: "*",
+    // methods: ["GET", "POST"]
   },
 });
 
