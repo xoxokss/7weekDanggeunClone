@@ -32,7 +32,7 @@ async function signup(req, res) {
       return;
     }
     if (existUsers.length) {
-      res.status(400).send({
+      res.status(409).send({
         result: false,
         message: "이미 가입된 휴대폰번호 또는 닉네임이 있습니다.",
       });
