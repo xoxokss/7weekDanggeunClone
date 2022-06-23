@@ -6,15 +6,20 @@ const Cryptr = require("cryptr");
 const cryptr = new Cryptr("gudetama");
 const Joi = require("joi");
 
+
 const UserSchema = Joi.object({
   phoneNum: Joi.string().pattern(new RegExp("^[0-9]{11,11}$")).required(),
-  nickname: Joi.string().pattern(
-    new RegExp("^[ㄱ-ㅎ가-힣0-9a-zA-Z@$!%#?&]{3,10}$")
-  ),
-  password: Joi.string().required().min(4),
-  passwordCheck: Joi.string().min(4),
-  userLocation: Joi.string(),
+  nickname: Joi.string()
+    .pattern(new RegExp("^[ㄱ-ㅎ가-힣0-9a-zA-Z@$!%#?&]{3,10}$"))
+    .required(),
+  password: Joi.string()
+    .pattern(new RegExp("^[0-9a-zA-Z@$!%#?&]{3,14}$"))
+    .required()
+    .min(4),
+  passwordCheck: Joi.string().required().min(4),
+  userLocation: Joi.string().required(),
 });
+
 
 // 회원가입 API
 async function signup(req, res) {
