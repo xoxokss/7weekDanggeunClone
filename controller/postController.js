@@ -19,14 +19,15 @@ async function allPost(req, res) {
 
   res.status(200).send({
     result: true,
-    posts : posts.map((a)=>({
-      postId:a._id,
-      userLocation:a.userLocation,
+    posts: posts.map((a) => ({
+      postId: a._id,
+      userLocation: a.userLocation,
       title: a.title,
-      price : a.price,
-      postImg : a.postImg,
-      likeNum : a.likeNum,
-      createdAt : a.createdAt
+      tradeState: a.tradeState,
+      price: a.price,
+      postImg: a.postImg,
+      likeNum: a.likeNum,
+      createdAt: a.createdAt,
     })),
   });
 }
@@ -158,6 +159,7 @@ async function getPostDetail(req, res) {
         content: existPost.content,
         postImg: existPost.postImg,
         nickname: existPost.nickname,
+        category: existPost.category,
         userImg: postUser.userImg,
         userLocation: existPost.userLocation,
         mannerOndo: postUser.mannerOndo,
@@ -171,8 +173,30 @@ async function getPostDetail(req, res) {
   }
 }
 
+// 거래 상태 토글 API (판매중 : 0 / 예약중 : 1 / 거래완료 : 2)
+async function updatatradeState(req, res) {
+  const { tradeState } = req.body;
+  const { postId } = req.params;
+  try {
+    await Post.findByIdAndUpdate(
+      { _id: postId }, //해당 postId 찾아서 내용 수정
+      {
+        $set: { tradeState: tradeState },
+      }
+    );
+
+    res.status(200).json({ result: true, message: "Updated trade state" });
+  } catch (err) {
+    res.status(400).json({
+      err,
+      result: false,
+      errorMessage: "coudn't upload trade state",
+    });
+  }
+}
+
 module.exports.allPost = allPost;
-module.exports.allPost2 = allPost2;
+module.exports.updatatradeState = updatatradeState;
 module.exports.writePost = writePost;
 module.exports.getPostDetail = getPostDetail;
 module.exports.updatePost = updatePost;
