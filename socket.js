@@ -20,17 +20,30 @@ const io = require("socket.io")(http, {
 });
 */
 
-
-
 // moment 한국시간 설정
 const moment = require("moment");
 require("moment-timezone");
 moment.tz.setDefault("Asia/Seoul");
 
 
+
+
 // 소켓 연결
 io.on("connection", (socket) => {
   console.log("유저가 접속했습니다.");
+
+  const req = socket.request // req 객체 꺼내서 쓰기
+  const {
+    headers : {referer}
+  }= req
+  const roomId = referer.split('/')[referer.split('/').lenth -1];
+  socket.join(roomId);
+  // 이벤트 - 채팅 메세지 - room
+
+  socket.on('disconnect', () => {
+    console.log('접속 종료')
+   socket.leave(roomId);
+  });
 
 /*
   // room 으로 방이 나뉠 때
@@ -43,6 +56,7 @@ io.on("connection", (socket) => {
     io.to(room[num]).emit(name, num, "leaveRoom");
   });
   */
+  
 
 
   // 이벤트 - 채팅 메세지 - 기본
@@ -56,14 +70,14 @@ io.on("connection", (socket) => {
     }); // 메시지 송신
   });
 
-  /*
+  
   // 이벤트 - 채팅 메세지 - room
   socket.on("chatting", (num, data) => {
     let {name, msg, userImg} = data
     a = num;
     io.to(room[a]).emit("chat message", name, msg, userImg); // 메시지 송신
   });
-*/
+
 
   // 이벤트 - 소켓 연결 해제
   socket.on("disconnect", () => {
