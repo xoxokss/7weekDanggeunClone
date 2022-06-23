@@ -6,18 +6,28 @@ const PostRouter = require("./router/postRouter");
 const LikeRouter = require("./router/likeRouter");
 const connectDB = require("./database/database");
 const moment = require("moment");
+
 const reqlogMiddleware = require("./middlewares/request-log-middleware");
 require("dotenv").config(); // env 패키지 연결
 
 const app = express();
 
+// moment 한국시간 설정
+require("moment-timezone");
+moment.tz.setDefault("Asia/Seoul");
+
 //express socket.io 통합 서버 연결 (8080번)
 const http = require("http").createServer(app);
 const io = require("socket.io")(http, {
   cors: {
-    origin: "http://spartastatic.s3-website.ap-northeast-2.amazonaws.com",
-    methods: ["GET", "POST"]
-  }
+    origin: [
+      "http://localhost:3000",
+      "http://spartastatic.s3-website.ap-northeast-2.amazonaws.com",
+      "http://localhost:8080",
+    ],
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
 });
 
 /*
@@ -77,7 +87,7 @@ const corsOption = {
   origin: [
     "http://localhost:3000",
     "http://spartastatic.s3-website.ap-northeast-2.amazonaws.com",
-    "http://localhost:8080"
+    "http://localhost:8080",
   ],
   credentials: true,
 };
@@ -98,6 +108,7 @@ app.use(cors(corsOption));
 
 // 최상위 URL 접속 메세지
 app.get("/", (req, res) => {
+  // res.header("Access-Control-Allow-Origin", "http://spartastatic.s3-website.ap-northeast-2.amazonaws.com")
   res.status(200).send("Backend Sever");
 });
 
