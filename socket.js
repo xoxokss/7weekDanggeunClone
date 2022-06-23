@@ -36,7 +36,7 @@ io.on("connection", (socket) => {
   const {
     headers : {referer}
   }= req
-  const roomId = referer.split('/')[referer.split('/').lenth -1];
+  const roomId = referer.split('/')[referer.split('/').lenth -2];
   socket.join(roomId);
   // 이벤트 - 채팅 메세지 - room
 
