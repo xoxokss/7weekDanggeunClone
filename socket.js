@@ -1,9 +1,6 @@
 const http = require("./app");
 //app.js 가져오기 (app.js 파일의 맨밑에 module.exports로 내보냈음)
 const socketIo = require("socket.io");
-
-const app = express();
-
 const io = socketIo(http, {
   cors: {
     // socket.io CORS 설정
@@ -23,20 +20,12 @@ const io = require("socket.io")(http, {
 });
 */
 
+
+
+// moment 한국시간 설정
 const moment = require("moment");
 require("moment-timezone");
 moment.tz.setDefault("Asia/Seoul");
-
-// moment 한국시간 설정
-require("moment-timezone");
-moment.tz.setDefault("Asia/Seoul");
-
-
-app.get('/chatting/:postId', function(req, res){
-    const roomId = req.params;
-
-    res.render('roomId', {room : roomId});
-});
 
 
 // 소켓 연결
