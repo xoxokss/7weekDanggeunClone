@@ -5,7 +5,7 @@ const io = socketIo(http, {
   cors: {
     // socket.io CORS 설정
     origin: "*",
-    methods: ["GET", "POST"],
+    // methods: ["GET", "POST"],
   },
 });
 
