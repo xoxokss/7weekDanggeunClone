@@ -25,8 +25,7 @@ const io = require("socket.io")(http, {
       "http://spartastatic.s3-website.ap-northeast-2.amazonaws.com",
       "http://localhost:8080",
     ],
-    methods: ["GET", "POST"],
-    credentials: true,
+    methods: ["GET", "POST"]
   },
 });
 
